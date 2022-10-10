@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+<!--    <link rel="shortcut icon" type="image/x-icon" href="/static/imgs/bp-icon.png?v=<?php echo env('APP.VERSION');?>">-->
+    <link rel="shortcut icon" type="image/x-icon" href="/static/imgs/bp-icon.png?v=<?php echo time();?>">
+    <title>Powered By</title>
+    <link rel="stylesheet" href="/static/css/common.css?v=<?php echo time();?>">
+
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="/static/element-ui/theme-chalk-index.css">
+    <meta name="robots" content="noindex">
+    <style>
+        .page{
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-align: center;
+            align-items: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            height: 100%;
+            min-height: 100vh;
+            background-color: rgb(23 26 27);
+            color: rgb(196 196 196);
+            font-size: 25px;
+            line-height: 30px;
+        }
+        .main1{
+            width: 190px;
+            /*height: 133px;*/
+        }
+
+        .main2{
+            display: -ms-flexbox;
+            display: flex;
+            flex-direction: row;
+            margin-top: 40px;
+
+        }
+        .icon-dengdai{
+            font-size: 25px;
+            line-height: 30px;
+        }
+        .main2-1{
+            margin-right: 10px;
+        }
+        .main2-2{
+            color: rgb(241 117 255);
+        }
+
+    </style>
+</head>
+<body>
+<div id="app" v-cloak>
+    <div class="page">
+        <img src="/static/imgs/bp-logo.png" class="main1" alt="">
+        <div class="main2">
+            <div class="main2-1">
+                <i class="iconfont icon-dengdai"></i>
+            </div>
+            <div class="main2-2 main2-1">Powered By</div>
+            <div class="main2-3 main2-1" @click="open">BoundaryPay</div>
+            <div class="main2-4">Payment Gateway</div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+<script src="/static/js/common.js?v=<?php echo time();?>"></script>
+<script src="/static/vue/vue-2.6.14.js"></script>
+
+<!-- 引入组件库 -->
+<script src="/static/element-ui/2.15.8-index.js"></script>
+
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+        },
+        mounted(){
+            this.auto_skip(2);
+        },
+        methods:{
+            /* 自动跳转*/
+            auto_skip(time){
+                if(getUrlKey('data')){
+                    setTimeout("location.href='/payment?data='+getUrlKey('data')",time * 1000);
+                }
+                else{
+                    this.$alert('<strong> <i>Some errors, please contact 644577519@qq.com</i> </strong>', 'Sorry', {
+                        dangerouslyUseHTMLString: true,
+                        showClose:false,
+                        confirmButtonText:'Ok',
+                        confirmButtonClass:'btn-confirm'
+                    });
+                }
+            },
+            open(msg,btntext) {
+                this.$alert('<strong> <i>'+msg+'</i> </strong>', 'Sorry', {
+                    dangerouslyUseHTMLString: true,
+                    showClose:false,
+                    confirmButtonText:'Back',
+                    confirmButtonClass:'btn-confirm'
+                });
+            }
+        }
+    })
+</script>
+</html>

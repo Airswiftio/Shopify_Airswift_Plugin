@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+<!--    <link rel="shortcut icon" type="image/x-icon" href="/static/imgs/bp-icon.png?v=<?php echo env('APP.VERSION');?>">-->
+    <link rel="shortcut icon" type="image/x-icon" href="/static/imgs/bp-icon.png?v=<?php echo time();?>">
+    <title>BoundaryPay</title>
+    <link rel="stylesheet" href="/static/css/common.css?v=<?php echo time();?>">
+    <link rel="stylesheet" href="/static/css/home_pc/payment/payment.css?v=<?php echo time();?>">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="/static/element-ui/theme-chalk-index.css">
+    <meta name="robots" content="noindex">
+</head>
+<body>
+<div id="app" v-cloak>
+    <div class="page">
+        <div class="container">
+            <div class="title">
+                <div class="title-name"></div>
+            </div>
+            <div class="container2">
+                <div class="container21">
+                    <div class="total"><div class="total1">Total</div> <div class="total2">{{ order.paymentAmount }} {{ order.paymentCurrency }}</div></div>
+                    <div class="order-id"><div class="order-id1">Order Id</div> <div class="order-id2">{{ order.orderID }}</div></div>
+                    <div class="order">
+                        <div class="order-desc">Order description</div>
+                        <table class="product-table">
+                            <thead class="product-table-header">
+                            <tr class="product-table-header-row">
+                                <th class="product-table-header-row-cell row-cell1">Item </th>
+                                <th class="product-table-header-row-cell row-cell2">Price </th>
+                                <th class="product-table-header-row-cell row-cell3">Quantity </th>
+                                <th class="product-table-header-row-cell row-cell4">Total </th>
+                            </tr>
+                            </thead>
+                            <tbody class="product-table-body">
+                            <tr class="product-table-body-row" v-for="value in order.products">
+                                <td class="product-table-body-row-cell word-break row-cell1">{{value.name}}</td>
+                                <td class="product-table-body-row-cell row-cell2">{{value.subtotal}}</td>
+                                <td class="product-table-body-row-cell row-cell3">{{value.quantity}}</td>
+                                <td class="product-table-body-row-cell row-cell4">{{value.total}}</td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="currency-select">Select payment currency</div>
+                    <div class="currency-select-box">
+                        <el-select @change="changev" v-model="selected_currency" placeholder="Please select payment currency">
+                            <el-option
+                                    v-for="item in currencys"
+                                    :key="item.code"
+                                    :value="item.code">
+                                <img class="currency-items1" :src="'https://nowpayments.io'+item.logo_url">
+<!--                                <img class="currency-items1" :src="'/static/imgs/icon/'+item.code+'3x.png'">-->
+<!--                                <img class="currency-items1" :src="item.logo_url">-->
+
+                                <span class="currency-items2">{{item.code}}</span>
+                            </el-option>
+                        </el-select>
+                        <div class="pay-notice">
+                            <i class="pay-notice1 iconfont icon-tishi"></i>
+                            <div class="pay-notice2">You will pay {{selected_total_amount}} {{selected_currency}}</div>
+                        </div>
+
+                    </div>
+                    <div class="email">
+                        <div class="email1">
+                            <input class="email11" v-model="uemail" placeholder="Your email for payment receipt" type="text">
+                        </div>
+                        <div class="email-notice">Leave your email so that we can notify you when the payment arrives to the merchant</div>
+                    </div>
+                    <div class="notice">Please check the order details and choose the currency you’d like to pay in.</div>
+
+                    <div class="terms-and-agreement">
+                        <div @click="change_terms_state" v-if="is_terms_agree" class="terms1 terms-checked"></div>
+                        <div @click="change_terms_state" v-else class="terms1 terms-unchecked"></div>
+                        <div class="terms2">Terms and agreement</div>
+
+                    </div>
+                </div>
+
+                <button class="pay-button" @click="paynow">Pay Now</button>
+                <div class="help-box">
+                    <a class="help-box1">Need help?</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+<script src="/static/js/common.js?v=<?php echo time();?>"></script>
+<script src="/static/vue/vue-2.6.14.js"></script>
+
+<!-- 引入组件库 -->
+<script src="/static/element-ui/2.15.8-index.js"></script>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            order:{},
+            currencys: {},
+            selected_total_amount:0,
+            selected_currency:'',
+            apikey:'',
+            uemail:'',
+            is_terms_agree:false,
+        },
+        mounted(){
+            this.get_order();
+        },
+        methods:{
+            /**
+             * 根据订单号获取订单信息
+             * Obtain order information according to order number
+             * @returns {boolean}
+             */
+            get_order(){
+                let ordersn = getUrlKey('data');
+                if(empty(ordersn)){
+                    this.error_tips('Order does not exist');
+                    return false;
+                }
+                fetch('/api-get_order?order_sn='+ordersn,{
+                    method:'post'
+                }).then(function (data){
+                    return data.text();
+                }).then(function (data){
+                    let res = json_to_obj(data);
+                    if(res.code != 1){
+                        vm.error_tips('Order data query failed');
+                        return false;
+                    }
+                    else{
+                        vm.order = res.data;
+                        vm.uemail = empty(vm.order.uemail) ? vm.order.customerEmail:vm.order.uemail
+                        vm.get_shop_currencys();
+                    }
+                })
+            },
+
+            /**
+             * 获取商户支持的数字货币列表
+             * Get the list of digital currencies supported by merchants
+             * @returns {boolean}
+             */
+            get_shop_currencys(){
+                let apikey = vm.order.apiKey;
+                if(empty(apikey)){
+                    this.error_tips('not set apikey');
+                    return false;
+                }
+                fetch('/api-get_shop_currencys?apikey='+apikey,{
+                    method:'post'
+                }).then(function (data){
+                    return data.text();
+                }).then(function (data){
+                    let res = json_to_obj(data);
+                    if(res.code != 1){
+                        vm.error_tips(res.msg);
+                        return false;
+                    }
+                    else{
+                        vm.currencys = res.data;
+                        if(!empty(vm.order.selected_currency)){
+                            vm.selected_currency = vm.order.selected_currency;
+                        }
+                        else{
+                            vm.selected_currency = vm.currencys[0].code;
+                        }
+                        vm.changev(vm.selected_currency);
+                    }
+                })
+            },
+
+            /**
+             * 根据选项改变，动态变化
+             * @param data
+             */
+            changev(data){
+                this.update_total_pay(data)
+            },
+
+            /**
+             * 更新要支付的数字货币总额
+             *
+             * @param c_type
+             * @param pay_amount
+             */
+            update_total_pay(c_type,pay_amount){
+                vm.selected_total_amount = ''
+
+                if(empty(vm.order.apiKey)){
+                    this.error_tips('not set apikey');
+                    return false;
+                }
+                if(empty(vm.order.paymentAmount)){
+                    this.error_tips('Please enter the amount of currency to be converted');
+                    return false;
+                }
+                if(empty(vm.order.paymentCurrency)){
+                    this.error_tips('Please select the currency before conversion');
+                    return false;
+                }
+                if(empty(vm.selected_currency)){
+                    this.error_tips('Please select the currency after conversion');
+                    return false;
+                }
+                let form_data = new FormData();
+                form_data.append('apikey',vm.order.apiKey)
+                form_data.append('amount_from',vm.order.paymentAmount)
+                form_data.append('currency_from',vm.order.paymentCurrency)
+                form_data.append('currency_to',vm.selected_currency)
+                fetch('/api-estimate',{
+                    method:'post',
+                    body: form_data,
+
+                }).then(function (data){
+                    return data.text();
+                }).then(function (data){
+                    let res = json_to_obj(data);
+                    if(res.code != 1){
+                        // vm.error_tips('Estimation failed');
+                        vm.error_tips(res.msg);
+                        return false;
+                    }
+                    else{
+                        vm.selected_total_amount = res.data.estimated_amount
+                    }
+                })
+            },
+
+            /**
+             * 切换是否同意条款
+             */
+            change_terms_state(){
+                vm.is_terms_agree = !vm.is_terms_agree;
+            },
+
+
+            //支付跳转操作
+            paynow(){
+                //判断是否满足支付条件（同意协议+输入邮箱+选择币种）
+                if(!this.selected_currency){
+                    this.error_tips('Please select payment currency!','OK')
+                    return false;
+                }
+                if(!this.uemail){
+                    this.error_tips('Please fill in your email for payment receipt!','OK')
+                    return false;
+                }
+                if(!this.is_terms_agree){
+                    this.error_tips('Please agree to the terms and agreement!','OK')
+                    return false;
+                }
+                if(vm.selected_total_amount <= 0){
+                    this.error_tips('Currency conversion failed!','OK')
+                    return false;
+                }
+
+                let form_data = new FormData();
+                form_data.append('order_sn',vm.order.order_sn)
+                form_data.append('uemail',vm.uemail)
+                form_data.append('selected_currency',vm.selected_currency)
+                fetch('/api-pay_now',{
+                    method:'post',
+                    body: form_data,
+
+                }).then(function (data){
+                    return data.text();
+                }).then(function (data){
+                    let res = json_to_obj(data);
+                    if(res.code != 1){
+                        // vm.error_tips('Estimation failed');
+                        vm.error_tips(res.msg);
+                        return false;
+                    }
+                    else{
+                        window.location.href = '/waiting?data='+getUrlKey('data')
+                    }
+                })
+            },
+
+            /**
+             * 错误提示
+             *
+             * @param msg
+             * @param btntext
+             * @returns {boolean}
+             */
+            error_tips(msg,btntext='Back') {
+                this.$alert('<strong> <i>'+msg+'</i> </strong>', 'Sorry', {
+                    dangerouslyUseHTMLString: true,
+                    showClose:false,
+                    confirmButtonText:btntext,
+                    confirmButtonClass:'btn-confirm'
+                });
+                return false;
+            }
+        }
+    })
+</script>
+</html>

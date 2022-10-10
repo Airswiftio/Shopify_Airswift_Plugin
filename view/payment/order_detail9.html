@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+<!--    <link rel="shortcut icon" type="image/x-icon" href="/static/imgs/bp-icon.png?v=<?php echo env('APP.VERSION');?>">-->
+    <link rel="shortcut icon" type="image/x-icon" href="/static/imgs/bp-icon.png?v=<?php echo time();?>">
+    <title>payment receipt for email</title>
+    <link rel="stylesheet" href="/static/css/common.css?v=<?php echo time();?>">
+    <link rel="stylesheet" href="/static/css/home_pc/payment/order_detail.css?v=<?php echo time();?>">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="/static/element-ui/theme-chalk-index.css">
+    <meta name="robots" content="noindex">
+</head>
+<body>
+<div id="app">
+    <div class="page">
+        <div class="container">
+            <div class="title">
+                <div class="title-name"></div>
+            </div>
+            <div class="container2">
+                <div class="container21">
+                    <div class="tips">
+                        <div class="tips1">Receipt from</div>
+                        <div class="tips2">BoundaryPay</div>
+                    </div>
+                    <div class="order-id">
+                        <div class="order-id1">Order Id</div>
+                        <div class="order-id2">{{ order.orderID }}</div>
+                    </div>
+                    <div class="order">
+                        <div class="order-desc">Order description</div>
+                        <table class="product-table">
+                            <thead class="product-table-header">
+                            <tr class="product-table-header-row">
+                                <td class="product-table-header-row-cell row-cell1">Item </td>
+                                <td class="product-table-header-row-cell row-cell2">Price </td>
+                                <td class="product-table-header-row-cell row-cell3">Quantity </td>
+                                <td class="product-table-header-row-cell row-cell4">Total </td>
+                            </tr>
+                            </thead>
+                            <tbody class="product-table-body">
+                            <tr class="product-table-body-row" v-for="value in order.products">
+                                <td class="product-table-body-row-cell word-break row-cell1">{{value.name}}</td>
+                                <td class="product-table-body-row-cell row-cell2">{{value.subtotal}}</td>
+                                <td class="product-table-body-row-cell row-cell3">{{value.quantity}}</td>
+                                <td class="product-table-body-row-cell row-cell4">{{value.total}}</td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="amount">
+                        <div class="amount1">Amount</div>
+                        <div class="amount2">{{ order.bp_data.amount }}</div>
+                    </div>
+                    <div class="from">
+                        <div class="from1">From</div>
+                        <div class="from2">{{ order.bp_data.from_address }}</div>
+                    </div>
+                    <div class="to">
+                        <div class="to1">To</div>
+                        <div class="to2">{{ order.bp_data.to_address }}</div>
+                    </div>
+                    <div class="gas-price">
+                        <div class="gas-price1">Gas Price</div>
+                        <div class="gas-price2">{{ order.bp_data.gas_price }}</div>
+                    </div>
+                    <div class="time">
+                        <div class="time1">Time</div>
+                        <div class="time2">{{ order.bp_data.pay_time }}</div>
+                    </div>
+                    <div class="status">
+                        <div class="status1">Status</div>
+                        <div class="status2">{{ order.bp_data.status }}</div>
+                    </div>
+                    <div class="cend"></div>
+                </div>
+                <div class="power-by">
+                    <div class="power-by1">Powered By</div>
+                    <div class="power-by2">
+                        <div class="power-by21">BoundaryPay</div>
+                        <div class="power-by22">Payment Gateway</div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+<script src="/static/js/common.js?v=<?php echo time();?>"></script>
+<script src="/static/vue/vue-2.6.14.js"></script>
+
+<!-- 引入组件库 -->
+<script src="/static/element-ui/2.15.8-index.js"></script>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            order:{},
+            currencys: {},
+            selected_total_amount:0,
+            selected_currency:'',
+            apikey:'',
+            uemail:'',
+            is_terms_agree:false,
+        },
+        mounted(){
+            this.get_order();
+        },
+        methods:{
+            /**
+             * 根据订单号获取订单信息
+             * Obtain order information according to order number
+             * @returns {boolean}
+             */
+            get_order(){
+                let ordersn = getUrlKey('data');
+                if(empty(ordersn)){
+                    this.error_tips('Order does not exist');
+                    return false;
+                }
+                fetch('/api-get_order?order_sn='+ordersn,{
+                    method:'post'
+                }).then(function (data){
+                    return data.text();
+                }).then(function (data){
+                    let res = json_to_obj(data);
+                    if(res.code != 1){
+                        vm.error_tips('Order data query failed');
+                        return false;
+                    }
+                    else{
+                        vm.order = res.data;
+                    }
+                })
+            },
+
+            /**
+             * 错误提示
+             *
+             * @param msg
+             * @param btntext
+             * @returns {boolean}
+             */
+            error_tips(msg,btntext='Back') {
+                this.$alert('<strong> <i>'+msg+'</i> </strong>', 'Sorry', {
+                    dangerouslyUseHTMLString: true,
+                    showClose:false,
+                    confirmButtonText:btntext,
+                    confirmButtonClass:'btn-confirm'
+                });
+                return false;
+            }
+        }
+    })
+</script>
+</html>

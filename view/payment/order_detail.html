@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>payment receipt for email</title>
+    <style>
+        *{
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            outline: 0;
+        }
+        body{
+            margin: 0;
+        }
+        table, tbody, td, tfoot, th, thead, tr {
+            vertical-align: top;
+        }
+        button, input, label, select, textarea {
+            margin: 0;
+            border: 0;
+            padding: 0;
+            display: inline-block;
+            white-space: normal;
+            background: 0 0;
+            line-height: normal;
+            font-size: 16px;
+            font-family: -apple-system,BlinkMacSystemFont,segoe ui,Roboto,Helvetica,Arial,sans-serif,apple color emoji,segoe ui emoji,segoe ui symbol;
+        }
+        .page{
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-align: center;
+            align-items: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            font-size: 13px;
+            line-height: 16px;
+            height: 100%;
+            min-height: 100vh;
+        }
+        .container{
+            display: flex;
+            flex-direction: column;
+            width: 375px;
+            background-color: #171A1B;
+            color: #C4C4C4;
+        }
+        .title{
+            width: 375px ;
+            height: 63px ;
+        }
+        .title-name{
+            font-size: 24px;
+            margin-top: 10px;
+            line-height: 30px;
+        }
+        .container2{
+            width: 380px;
+            margin: 0 auto 0;
+            padding: 25px 24px 0 24px;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: column;
+            flex-direction: column;
+        }
+        .container21{
+            padding: 0 8px;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: column;
+            flex-direction: column;
+        }
+        .tips{
+            font-size: 23px;
+            line-height: 25px;
+            padding-bottom: 28px;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: row;
+            flex-direction: row;
+            justify-content:center;
+        }
+        .tips1{
+            padding-right: 8px;
+        }
+        .tips2{
+            color: #EC74FF;
+        }
+        .order-id{
+            border-top: 1px solid #424242;
+            padding: 19px 0 12px 0;
+            border-bottom: 1px solid #000000;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: row;
+            flex-direction: row;
+            justify-content:space-between;
+        }
+
+        .order-desc{
+            border-top: 1px solid #424242;
+            padding: 15px 0 16px 0;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-align: center;
+            align-items: center;
+            -ms-flex-pack: justify;
+            justify-content: space-between;
+        }
+        .product-table{
+            width: 100%;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #000000;
+
+        }
+        .product-table-header{
+            text-align: left;
+        }
+        .product-table-header-row{
+        }
+        .product-table-header-row-cell{
+        }
+        .product-table-body-row{
+        }
+
+        .product-table-body-row .word-break{
+            word-break: break-all;
+        }
+        .product-table-body-row-cell{
+        }
+        .row-cell1{
+            width: 115px;
+        }
+        .row-cell2{
+            width: 71px;
+        }
+        .row-cell3{
+            width: 59px;
+        }
+        .row-cell4{
+            text-align: right
+        }
+        .amount{
+            border-top: 1px solid #424242;
+            padding: 15px 0 12px 0;
+            border-bottom: 1px solid #000000;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: row;
+            flex-direction: row;
+            justify-content:space-between;
+        }
+        .from{
+            border-top: 1px solid #424242;
+            padding: 15px 0 12px 0;
+            border-bottom: 1px solid #000000;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: row;
+            flex-direction: row;
+            justify-content:space-between;
+        }
+        .from2{
+            width: 166px;
+            word-wrap:break-word;
+            text-align: center;
+            font-size: 11px;
+            line-height: 13px;
+        }
+
+        .to{
+            border-top: 1px solid #424242;
+            padding: 15px 0 12px 0;
+            border-bottom: 1px solid #000000;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: row;
+            flex-direction: row;
+            justify-content:space-between;
+        }
+        .to2{
+            width: 166px;
+            word-wrap:break-word;
+            text-align: center;
+            font-size: 11px;
+            line-height: 13px;
+        }
+
+        .gas-price{
+            border-top: 1px solid #424242;
+            padding: 15px 0 12px 0;
+            border-bottom: 1px solid #000000;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: row;
+            flex-direction: row;
+            justify-content:space-between;
+        }
+
+        .time{
+            border-top: 1px solid #424242;
+            padding: 15px 0 12px 0;
+            border-bottom: 1px solid #000000;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: row;
+            flex-direction: row;
+            justify-content:space-between;
+        }
+
+        .status{
+            border-top: 1px solid #424242;
+            padding: 15px 0 12px 0;
+            border-bottom: 1px solid #000000;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: row;
+            flex-direction: row;
+            justify-content:space-between;
+        }
+        .cend{
+            border-top: 1px solid #424242;
+            height: 96px;
+        }
+
+        .power-by{
+            width: 100%;
+            margin-top: 24px;
+            margin-bottom: 70px;
+            font-size: 16px;
+            line-height: 20px;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            text-align: center;
+        }
+        .power-by1{
+            padding-bottom: 5px;
+            display: -webkit-box;
+            -webkit-box-orient:horizontal;
+            -webkit-box-pack: justify;
+        }
+        .power-by2{
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: row;
+            flex-direction: row;
+            justify-content:center;
+        }
+        .power-by11{
+            padding-right: 5px;
+        }
+        .power-by21{
+            color: #EC74FF;
+            padding-right: 5px;
+        }
+
+    </style>
+</head>
+<body>
+<div id="app" v-cloak>
+    <div class="page">
+        <div class="container">
+            <div class="title">
+                <div class="title-name"></div>
+            </div>
+            <div class="container2">
+                <div class="container21">
+                    <div class="tips">
+                        <div class="tips1">Receipt from</div>
+                        <div class="tips2">BoundaryPay</div>
+                    </div>
+                    <div class="order-id">
+                        <div class="order-id1">Order Id</div>
+                        <div class="order-id2"><?php echo $data['orderID'];?></div>
+                    </div>
+                    <div class="order">
+                        <div class="order-desc">Order description</div>
+                        <table class="product-table">
+                            <thead class="product-table-header">
+                            <tr class="product-table-header-row">
+                                <td class="product-table-header-row-cell row-cell1">Item </td>
+                                <td class="product-table-header-row-cell row-cell2">Price </td>
+                                <td class="product-table-header-row-cell row-cell3">Quantity </td>
+                                <td class="product-table-header-row-cell row-cell4">Total </td>
+                            </tr>
+                            </thead>
+                            <tbody class="product-table-body">
+                            <?php foreach($data['products'] as $key=>$value ): ?>
+                            <tr class="product-table-body-row">
+                                <td class="product-table-body-row-cell word-break row-cell1"><?php echo $value['name'];?></td>
+                                <td class="product-table-body-row-cell row-cell2"><?php echo $value['subtotal'];?></td>
+                                <td class="product-table-body-row-cell row-cell3"><?php echo $value['quantity'];?></td>
+                                <td class="product-table-body-row-cell row-cell4"><?php echo $value['total'];?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="amount">
+                        <div class="amount1">Amount</div>
+                        <div class="amount2"><?php echo $data['bp_data']['amount'];?></div>
+                    </div>
+<!--                    <div class="from">-->
+<!--                        <div class="from1">From</div>-->
+<!--                        <div class="from2"><?php echo $data['bp_data']['from_address'];?></div>-->
+<!--                    </div>-->
+                    <div class="to">
+                        <div class="to1">To</div>
+                        <div class="to2"><?php echo $data['bp_data']['to_address'];?></div>
+                    </div>
+                    <div class="gas-price">
+                        <div class="gas-price1">Gas Price</div>
+                        <div class="gas-price2"><?php echo $data['bp_data']['gas_price'];?></div>
+                    </div>
+<!--                    <div class="time">-->
+<!--                        <div class="time1">Time</div>-->
+<!--                        <div class="time2"><?php echo $data['bp_data']['pay_time'];?></div>-->
+<!--                    </div>-->
+                    <div class="status">
+                        <div class="status1">Status</div>
+                        <div class="status2"><?php echo $data['bp_data']['status'];?></div>
+                    </div>
+                    <div class="cend"></div>
+                </div>
+                <div class="power-by">
+                    <div class="power-by1">
+                        <div class="power-by11">Powered</div>
+                        <div class="power-by12">By</div>
+                    </div>
+                    <div class="power-by2">
+                        <div class="power-by21">BoundaryPay</div>
+                        <div class="power-by22">Payment Gateway</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
