@@ -23,8 +23,8 @@
 if (!function_exists('chttp')) {
     function chttp($d = [])
     {
-        $mrd = ['url' => '', 'do' => '', 'tz' => '', 'data' => '', 'ref' => '', 'llq' => '', 'qt' => '', 'cookie' => '', 'time' => '', 'daili' => [], 'headon' => '', 'code' => '', 'nossl' => '','to_utf8'=>'','gzip'=>'','port'=>''];
-        $d   = array_merge($mrd, $d);
+        $mrd = ['url' => '', 'do' => '', 'tz' => '', 'data' => '', 'ref' => '', 'llq' => '', 'qt' => '', 'cookie' => '', 'time' => '', 'daili' => [], 'headon' => '', 'code' => '', 'nossl' => '', 'to_utf8' => '', 'gzip' => '', 'port' => ''];
+        $d = array_merge($mrd, $d);
 
         $url = $d['url'];
         if ($url == "") {
@@ -34,8 +34,7 @@ if (!function_exists('chttp')) {
 
         if ($d['llq']) {
             $header[] = "User-Agent:" . $d['agent'];
-        }
-        else {
+        } else {
             $header[] = 'User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64)AppleWebKit/537.36 (KHTML, like Gecko)Chrome/63.0.3239.26 Safari/537.36';
         }
         if ($d['ref']) {
@@ -43,7 +42,7 @@ if (!function_exists('chttp')) {
         }
 
         $ch = curl_init($url);
-        if($d['port'] != ''){
+        if ($d['port'] != '') {
             curl_setopt($ch, CURLOPT_PORT, intval($d['port']));
         }
         //cookie 文件/文本
@@ -56,9 +55,8 @@ if (!function_exists('chttp')) {
                 $d['cookie'] = realpath($d['cookie']);
                 curl_setopt($ch, CURLOPT_COOKIEJAR, $d['cookie']);
                 curl_setopt($ch, CURLOPT_COOKIEFILE, $d['cookie']);
-            }
-            else {
-                $cookie   = 'cookie: ' . $d['cookie'];
+            } else {
+                $cookie = 'cookie: ' . $d['cookie'];
                 $header[] = $cookie;
             }
         }
@@ -78,7 +76,7 @@ if (!function_exists('chttp')) {
         }
 
         $postData = $d['data'];
-        $timeout  = $d['time'] == "" ? 10 : ints($d['time'], 10);
+        $timeout = $d['time'] == "" ? 10 : ints($d['time'], 10);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
         if ($d['gzip'] != "0") {
@@ -88,8 +86,7 @@ if (!function_exists('chttp')) {
         //跳转跟随
         if ($d['tz'] == "0") {
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
-        }
-        else {
+        } else {
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
         }
 
@@ -102,8 +99,7 @@ if (!function_exists('chttp')) {
         //请求方式
         if (in_array(strtoupper($d['do']), ['DELETE', 'PUT'])) {
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, strtoupper($d['do']));
-        }
-        else {
+        } else {
             //POST数据
             if (!empty($postData)) {
                 if (is_array($postData)) {
@@ -111,8 +107,7 @@ if (!function_exists('chttp')) {
                 }
                 curl_setopt($ch, CURLOPT_POST, 1);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-            }
-            //POST空内容
+            } //POST空内容
             elseif (strtoupper($d['do']) == "POST") {
                 curl_setopt($ch, CURLOPT_POST, 1);
             }
@@ -135,7 +130,7 @@ if (!function_exists('chttp')) {
         //是否返回状态码
         if ($d['code'] == "1") {
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            $content  = [$httpCode, $content];
+            $content = [$httpCode, $content];
         }
 
         curl_close($ch);
@@ -153,8 +148,7 @@ if (!function_exists('to_utf8')) {
                     $data[$key] = to_utf8($value);
                 }
                 return $data;
-            }
-            else {
+            } else {
                 $fileType = mb_detect_encoding($data, ['UTF-8', 'GBK', 'LATIN1', 'BIG5']);
                 if ($fileType != 'UTF-8') {
                     $data = mb_convert_encoding($data, 'utf-8', $fileType);
@@ -167,7 +161,8 @@ if (!function_exists('to_utf8')) {
 
 
 //统一返回方法
-function rs($msg = '', $code = -1, $data = '', $qt = []) {
+function rs($msg = '', $code = -1, $data = '', $qt = [])
+{
     $rs = ['code' => $code, 'msg' => $msg];
     if ($data) {
         $rs['data'] = $data;
@@ -182,7 +177,7 @@ function rs($msg = '', $code = -1, $data = '', $qt = []) {
  * 成功返回
  *
  * @param string $msg
- * @param array  $data
+ * @param array $data
  *
  * @return array
  * @author wumengmeng <wu_mengmeng@foxmail.com>
@@ -196,8 +191,8 @@ function r_ok($msg = '', $data = [])
  * 失败返回
  *
  * @param        $msg
- * @param int    $code
- * @param array  $data
+ * @param int $code
+ * @param array $data
  *
  * @return array
  * @author wumengmeng <wu_mengmeng@foxmail.com>
@@ -217,6 +212,13 @@ function filter_spaces($str = '')
 function glwb($data)
 {
     return $data;
+}
+
+
+
+function uid()
+{
+    return (new \SimonJWTToken\JWTToken())->userId();
 }
 
 

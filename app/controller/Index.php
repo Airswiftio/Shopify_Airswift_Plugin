@@ -6,6 +6,7 @@ use app\service\ServiceUser;
 
 class Index extends Base
 {
+
     public function logIn()
     {
         $d = input();
@@ -14,8 +15,7 @@ class Index extends Base
 
     public function logOut()
     {
-        $d = input();
-        return ServiceUser::logOut($d);
+
     }
 
     public function signUp()
@@ -27,24 +27,28 @@ class Index extends Base
     public function createApp()
     {
         $d = input();
+        $d['uid'] = uid();
         return ServiceAppkey::createApp($d);
     }
 
     public function appList()
     {
         $d = input();
+        $d['uid'] = uid();
         return ServiceAppkey::appList($d);
     }
 
     public function editApp()
     {
         $d = input();
+        $d['uid'] = uid();
         return ServiceAppkey::editApp($d);
     }
 
     public function delApp()
     {
         $d = input();
+        $d['uid'] = uid();
         return ServiceAppkey::delApp($d);
     }
 
