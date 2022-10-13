@@ -13,29 +13,30 @@ class ServiceAppkey extends Base
             return r_fail('Uid cannot be empty!');
         }
         if(empty($d['app_key'])){
-            return r_fail('Please enter app_key!');
+            return r_fail('Please enter AppKey!');
         }
         if(empty($d['app_secret'])){
-            return r_fail('Please enter app_secret!');
+            return r_fail('Please enter AppSecret!');
         }
         if(empty($d['sign_key'])){
-            return r_fail('Please enter sign_key!');
-        }
-        if(empty($d['shopify_api_key'])){
-            return r_fail('Please enter shopify_api_key!');
-        }
-        if(empty($d['shopify_api_secret'])){
-            return r_fail('Please enter shopify_api_secret!');
-        }
-        if(empty($d['shopify_access_token'])){
-            return r_fail('Please enter shopify_access_token!');
+            return r_fail('Please enter SignKey!');
         }
         if(empty($d['shopify_domain'])){
-            return r_fail('Please enter shopify_domain!');
+            return r_fail('Please enter ShopifyDomain!');
         }
         if(empty($d['shopify_shop_name'])){
-            return r_fail('Please enter shopify_shop_name!');
+            return r_fail('Please enter ShopifyShopName!');
         }
+        if(empty($d['shopify_api_key'])){
+            return r_fail('Please enter ShopifyApiKey!');
+        }
+        if(empty($d['shopify_api_secret'])){
+            return r_fail('Please enter ShopifyApiSecret!');
+        }
+        if(empty($d['shopify_access_token'])){
+            return r_fail('Please enter ShopifyAccessToken!');
+        }
+
 
         if(!is_numeric($d['uid'])){
             return r_fail('uid error!');
@@ -60,28 +61,28 @@ class ServiceAppkey extends Base
             return r_fail('ID cannot be empty!');
         }
         if(empty($d['app_key'])){
-            return r_fail('Please enter app_key!');
+            return r_fail('Please enter AppKey!');
         }
         if(empty($d['app_secret'])){
-            return r_fail('Please enter app_secret!');
+            return r_fail('Please enter AppSecret!');
         }
         if(empty($d['sign_key'])){
-            return r_fail('Please enter sign_key!');
-        }
-        if(empty($d['shopify_api_key'])){
-            return r_fail('Please enter shopify_api_key!');
-        }
-        if(empty($d['shopify_api_secret'])){
-            return r_fail('Please enter shopify_api_secret!');
-        }
-        if(empty($d['shopify_access_token'])){
-            return r_fail('Please enter shopify_access_token!');
+            return r_fail('Please enter SignKey!');
         }
         if(empty($d['shopify_domain'])){
-            return r_fail('Please enter shopify_domain!');
+            return r_fail('Please enter ShopifyDomain!');
         }
         if(empty($d['shopify_shop_name'])){
-            return r_fail('Please enter shopify_shop_name!');
+            return r_fail('Please enter ShopifyShopName!');
+        }
+        if(empty($d['shopify_api_key'])){
+            return r_fail('Please enter ShopifyApiKey!');
+        }
+        if(empty($d['shopify_api_secret'])){
+            return r_fail('Please enter ShopifyApiSecret!');
+        }
+        if(empty($d['shopify_access_token'])){
+            return r_fail('Please enter ShopifyAccessToken!');
         }
         if(!is_numeric($d['id'])){
             return r_fail('id error!');
@@ -99,6 +100,7 @@ class ServiceAppkey extends Base
         if(empty($app)){
             return r_fail('app does not exist!');
         }
+        unset($d['create_time'],$d['update_time']);
 
         $allowField = ['app_key','app_secret','sign_key','shopify_api_key','shopify_api_secret','shopify_access_token','shopify_domain','shopify_shop_name'];
         $app = Appkey::update($d,['id'=>$d['id'],'uid'=>$d['uid']],$allowField)->toArray();
@@ -132,6 +134,25 @@ class ServiceAppkey extends Base
         }
 
         return r_ok('ok');
+    }
+
+    public function getApp($d=[]){
+        $d = glwb($d);
+        if(empty($d['id'])){
+            return r_fail('ID cannot be empty!');
+        }
+        if(!is_numeric($d['id'])){
+            return r_fail('id error!');
+        }
+        if(!is_numeric($d['uid'])){
+            return r_fail('uid error!');
+        }
+
+        $app = Appkey::where('uid',$d['uid'])->where('id',$d['id'])->findOrEmpty()->toArray();
+        if(empty($app)){
+            return r_fail('app does not exist.');
+        }
+        return r_ok('ok',$app);
     }
 
     public function appList($d=[]){

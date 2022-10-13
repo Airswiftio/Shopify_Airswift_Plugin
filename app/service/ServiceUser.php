@@ -39,7 +39,7 @@ class ServiceUser extends Base
             return r_fail($new_JWTToken->getErrorMsg());
         }
 
-        return r_ok('ok', ['user'=>$user,'token'=>$jwtToken]);
+        return r_ok('ok', $jwtToken);
     }
 
     public function signUp($d=[]){
@@ -76,9 +76,20 @@ class ServiceUser extends Base
             return r_fail($new_JWTToken->getErrorMsg());
         }
 
-        return r_ok('ok', ['user'=>$user,'token'=>$jwtToken]);
+        return r_ok('ok', $jwtToken);
     }
 
+    public function getUserInfo($uid = 0){
+        $uid = intval($uid);
+        if($uid <= 0){
+            return r_fail('uid error!');
+        }
 
+        $user = User::where('id',$uid)->findOrEmpty()->toArray();
+        if(empty($user)){
+            return r_fail('user does not exist!');
+        }
 
+        return r_ok('ok', $user);
+    }
 }

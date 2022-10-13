@@ -24,11 +24,24 @@ class Index extends Base
         return ServiceUser::signUp($d);
     }
 
+    public function getUserInfo()
+    {
+        return ServiceUser::getUserInfo(uid());
+    }
+
     public function createApp()
     {
         $d = input();
         $d['uid'] = uid();
         return ServiceAppkey::createApp($d);
+    }
+
+
+    public function getApp()
+    {
+        $d = input();
+        $d['uid'] = uid();
+        return ServiceAppkey::getApp($d);
     }
 
     public function appList()

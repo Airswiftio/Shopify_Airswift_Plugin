@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: 'Vue Admin Template',
+  title: 'AirSwift Merchant',
 
   /**
    * @type {boolean} true | false

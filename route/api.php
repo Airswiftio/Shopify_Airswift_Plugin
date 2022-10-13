@@ -20,7 +20,11 @@ Route::group( function(){
         Route::post('logIn', 'index/logIn');
         Route::post('logOut', 'index/logOut');
         Route::post('signUp', 'index/signUp');
+
+        Route::get('getUserInfo', 'index/getUserInfo');
+
         Route::post('createApp', 'index/createApp');
+        Route::get('getApp', 'index/getApp');
         Route::get('appList', 'index/appList');
         Route::post('editApp', 'index/editApp');
         Route::delete('delApp', 'index/delApp');

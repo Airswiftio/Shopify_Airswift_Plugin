@@ -1,10 +1,11 @@
-import { login, logout, getInfo } from '@/api/user'
-import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
+import { getUserInfo, logIn, signUp } from '@/request/api'
+import { delJWTToken, getJWTToken, setJWTToken } from '@/utils/function'
+import avatar_img from '@/assets/avatar.gif'
 
 const getDefaultState = () => {
   return {
-    token: getToken(),
+    token: getJWTToken(),
     name: '',
     avatar: ''
   }
@@ -32,11 +33,24 @@ const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
+      logIn({ username: username.trim(), password: password }).then(response => {
         const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
-        resolve()
+        commit('SET_TOKEN', data)
+        setJWTToken(data)
+        resolve(response)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  sign_up({ commit }, userInfo) {
+    const { username, password } = userInfo
+    return new Promise((resolve, reject) => {
+      signUp({ username: username.trim(), password: password }).then(response => {
+        const { data } = response
+        commit('SET_TOKEN', data)
+        setJWTToken(data)
+        resolve(response)
       }).catch(error => {
         reject(error)
       })
@@ -46,18 +60,13 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
-        const { data } = response
-
-        if (!data) {
-          return reject('Verification failed, please Login again.')
+      getUserInfo().then(response => {
+        const { code, data } = response
+        if (code === 1) {
+          commit('SET_NAME', data.username)
+          commit('SET_AVATAR', avatar_img)
         }
-
-        const { name, avatar } = data
-
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
-        resolve(data)
+        resolve(response)
       }).catch(error => {
         reject(error)
       })
@@ -67,21 +76,17 @@ const actions = {
   // user logout
   logout({ commit, state }) {
     return new Promise((resolve, reject) => {
-      logout(state.token).then(() => {
-        removeToken() // must remove  token  first
-        resetRouter()
-        commit('RESET_STATE')
-        resolve()
-      }).catch(error => {
-        reject(error)
-      })
+      delJWTToken() // must remove  token  first
+      resetRouter()
+      commit('RESET_STATE')
+      resolve()
     })
   },
 
   // remove token
   resetToken({ commit }) {
     return new Promise(resolve => {
-      removeToken() // must remove  token  first
+      delJWTToken() // must remove  token  first
       commit('RESET_STATE')
       resolve()
     })
