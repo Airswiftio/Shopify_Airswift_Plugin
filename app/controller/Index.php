@@ -10,7 +10,7 @@ class Index extends Base
     public function logIn()
     {
         $d = input();
-        return ServiceUser::logIn($d);
+        return (new ServiceUser())->logIn($d);
     }
 
     public function logOut()
@@ -21,19 +21,19 @@ class Index extends Base
     public function signUp()
     {
         $d = input();
-        return ServiceUser::signUp($d);
+        return (new ServiceUser())->signUp($d);
     }
 
     public function getUserInfo()
     {
-        return ServiceUser::getUserInfo(uid());
+        return (new ServiceUser())->getUserInfo(uid());
     }
 
     public function createApp()
     {
         $d = input();
         $d['uid'] = uid();
-        return ServiceAppkey::createApp($d);
+        return (new ServiceAppkey())->createApp($d);
     }
 
 
@@ -41,28 +41,28 @@ class Index extends Base
     {
         $d = input();
         $d['uid'] = uid();
-        return ServiceAppkey::getApp($d);
+        return (new ServiceAppkey())->getApp($d);
     }
 
     public function appList()
     {
         $d = input();
         $d['uid'] = uid();
-        return ServiceAppkey::appList($d);
+        return (new ServiceAppkey())->appList($d);
     }
 
     public function editApp()
     {
         $d = input();
         $d['uid'] = uid();
-        return ServiceAppkey::editApp($d);
+        return (new ServiceAppkey())->editApp($d);
     }
 
     public function delApp()
     {
         $d = input();
         $d['uid'] = uid();
-        return ServiceAppkey::delApp($d);
+        return (new ServiceAppkey())->delApp($d);
     }
 
 }

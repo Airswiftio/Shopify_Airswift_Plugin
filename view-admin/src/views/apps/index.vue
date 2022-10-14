@@ -23,6 +23,11 @@
           <span>{{ scope.row.app_key }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="Additional Script" width="220" align="center">
+        <template slot-scope="scope">
+          <span>{{ scope.row.html }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="AppSecret" width="220" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.app_secret }}</span>
@@ -39,11 +44,11 @@
           <span>{{ scope.row.shopify_domain }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="ShopifyShopName" width="220" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.shopify_shop_name }}</span>
-        </template>
-      </el-table-column>
+<!--      <el-table-column label="ShopifyShopName" width="220" align="center">-->
+<!--        <template slot-scope="scope">-->
+<!--          <span>{{ scope.row.shopify_shop_name }}</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
       <el-table-column label="ShopifyApiKey" width="220" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.shopify_api_key }}</span>
@@ -90,9 +95,9 @@
         <el-form-item label="ShopifyDomain">
           <el-input v-model="temp.shopify_domain" />
         </el-form-item>
-        <el-form-item label="ShopifyShopName">
-          <el-input v-model="temp.shopify_shop_name" />
-        </el-form-item>
+<!--        <el-form-item label="ShopifyShopName">-->
+<!--          <el-input v-model="temp.shopify_shop_name" />-->
+<!--        </el-form-item>-->
         <el-form-item label="ShopifyApiKey">
           <el-input v-model="temp.shopify_api_key" />
         </el-form-item>
@@ -146,7 +151,7 @@ export default {
         app_secret: '',
         sign_key: '',
         shopify_domain: '',
-        shopify_shop_name: '',
+        // shopify_shop_name: '',
         shopify_api_key: '',
         shopify_api_secret: '',
         shopify_access_token: ''
@@ -172,7 +177,7 @@ export default {
         app_secret: '',
         sign_key: '',
         shopify_domain: '',
-        shopify_shop_name: '',
+        // shopify_shop_name: '',
         shopify_api_key: '',
         shopify_api_secret: '',
         shopify_access_token: ''
@@ -256,9 +261,11 @@ export default {
           title: 'Success',
           message: 'Delete Successfully',
           type: 'success',
-          duration: 2000
+          duration: 2000,
+          onClose: () => {
+            window.location.reload()
+          }
         })
-        this.list.splice(index, 1)
       } else {
         this.$message({
           message: resc.msg,

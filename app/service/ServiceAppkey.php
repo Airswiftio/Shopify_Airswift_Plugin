@@ -24,9 +24,9 @@ class ServiceAppkey extends Base
         if(empty($d['shopify_domain'])){
             return r_fail('Please enter ShopifyDomain!');
         }
-        if(empty($d['shopify_shop_name'])){
-            return r_fail('Please enter ShopifyShopName!');
-        }
+//        if(empty($d['shopify_shop_name'])){
+//            return r_fail('Please enter ShopifyShopName!');
+//        }
         if(empty($d['shopify_api_key'])){
             return r_fail('Please enter ShopifyApiKey!');
         }
@@ -72,9 +72,9 @@ class ServiceAppkey extends Base
         if(empty($d['shopify_domain'])){
             return r_fail('Please enter ShopifyDomain!');
         }
-        if(empty($d['shopify_shop_name'])){
-            return r_fail('Please enter ShopifyShopName!');
-        }
+//        if(empty($d['shopify_shop_name'])){
+//            return r_fail('Please enter ShopifyShopName!');
+//        }
         if(empty($d['shopify_api_key'])){
             return r_fail('Please enter ShopifyApiKey!');
         }
@@ -152,6 +152,7 @@ class ServiceAppkey extends Base
         if(empty($app)){
             return r_fail('app does not exist.');
         }
+
         return r_ok('ok',$app);
     }
 
@@ -165,6 +166,10 @@ class ServiceAppkey extends Base
         }
 
         $app = Appkey::where('uid',$d['uid'])->select()->toArray();
+        foreach ($app as $kk=>$vv){
+            $app[$kk]['html'] = '<script id="asw_pop" src="'.env('APP.shopify_js_url','http://'.$_SERVER['HTTP_HOST']).'/shopify.js" data-api="'.$vv['app_key'].'"></script>';
+//            $app[$kk]['html'] = '<script id="asw_pop" src="https://yunyi-cloud.oss-cn-hangzhou.aliyuncs.com/shopify.js" data-api="'.$vv['app_key'].'"></script>';
+        }
         return r_ok('ok',$app);
     }
 

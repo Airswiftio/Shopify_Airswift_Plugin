@@ -30,7 +30,7 @@ class ServiceShopify extends Base
         }
 
         //获取appkey组信息
-        $appInfo = ServiceShopify::getAppInfo($d['app_key']);
+        $appInfo = (new ServiceShopify())->getAppInfo($d['app_key']);
         if(empty($appInfo)){
             return r_fail('app_key error.');
         }
@@ -86,7 +86,7 @@ QUERY;
         }
 
         //获取appkey组信息
-        $appInfo = ServiceShopify::getAppInfo($d['app_key']);
+        $appInfo = (new ServiceShopify())->getAppInfo($d['app_key']);
         if(empty($appInfo)){
             return r_fail('app_key error.');
         }
@@ -146,7 +146,7 @@ Query;
         }
 
         //获取appkey组信息
-        $appInfo = ServiceShopify::getAppInfo($d['app_key']);
+        $appInfo = (new ServiceShopify())->getAppInfo($d['app_key']);
         if(empty($appInfo)){
             return r_fail('app_key error.');
         }

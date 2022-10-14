@@ -1,6 +1,7 @@
 /.idea
 /.vscode
 *.log
-.env
 /vendor
 /runtime
+/public/merchant
+/view-admin/node_modules

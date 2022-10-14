@@ -7,7 +7,7 @@ class ServiceOrder extends Base
 
     public function createPayment($d=[]){
         $order_id = $d['order_id'];
-        $res = ServiceShopify::getOrder($d);
+        $res = (new ServiceShopify())->getOrder($d);
         if($res['code'] !== 1){
             return $res;
         }
@@ -23,7 +23,7 @@ class ServiceOrder extends Base
         }
 
         //Get appkey collection information
-        $appInfo = ServiceShopify::getAppInfo($d['app_key']);
+        $appInfo = (new ServiceShopify())->getAppInfo($d['app_key']);
         if(empty($appInfo)){
             return r_fail('app_key error.');
         }
@@ -31,12 +31,12 @@ class ServiceOrder extends Base
         //Check whether the appKey and appSecret is exist
         if(empty($appInfo['app_key'])){
             $msg = "AirSwiftPay's appKey is not exist!";
-            self::xielog("$order_id-----$msg");
+            $this->xielog("$order_id-----$msg");
             return r_fail('Something went wrong, please contact the merchant for handling!');
         }
         if(empty($appInfo['app_secret'])){
             $msg = "AirSwiftPay's appSecret is not exist!";
-            self::xielog("$order_id-----$msg");
+            $this->xielog("$order_id-----$msg");
             return r_fail('Something went wrong, please contact the merchant for handling!');
 
         }
@@ -75,7 +75,7 @@ class ServiceOrder extends Base
         $php_result = json_decode($result);
         if ($php_result->code !== 200) {
             $msg = "AirSwiftPay's createPayment failed!(".$php_result->message.")";
-            self::xielog("$order_id-----$msg");
+            $this->xielog("$order_id-----$msg");
             return r_fail('Something went wrong, please contact the merchant!');
         } else {
             return r_ok('ok', $php_result->data);
@@ -85,12 +85,12 @@ class ServiceOrder extends Base
     public function callBack($d = []){
 
         if(empty($d) || !isset($d['sign']) || !isset($d['clientOrderSn']) || !isset($d['coinUnit']) || !isset($d['amount']) || !isset($d['rate']) ) {
-            self::xielog($d);
+            $this->xielog($d);
             exit('failed');
         }
 
         //Get appkey collection information
-        $appInfo = ServiceShopify::getAppInfo($d['remarks']);
+        $appInfo = (new ServiceShopify())->getAppInfo($d['remarks']);
         if(empty($appInfo)){
             return r_fail('app_key error.');
         }
@@ -99,46 +99,46 @@ class ServiceOrder extends Base
         $sign = md5($appInfo['sign_key'].$d['clientOrderSn'].$d['coinUnit'].$d['amount'].$d['rate']);
         if(strtolower($sign) !== strtolower($d['sign'])){
             $d['err_msg'] = 'sign error:'.$sign;
-            self::xielog($d);
+            $this->xielog($d);
             exit('failed');
         }
 
         $order_id = $d["clientOrderSn"];
         if ($d["status"] == 1) {
-            $res = ServiceShopify::orderMarkPaid(['app_key'=>$appInfo["app_key"],'order_id'=>$d["clientOrderSn"]]);
+            $res = (new ServiceShopify())->orderMarkPaid(['app_key'=>$appInfo["app_key"],'order_id'=>$d["clientOrderSn"]]);
             if($res['code'] === 1){
-                self::xielog("$order_id-----completed-----Order has been paid.");
+                $this->xielog("$order_id-----completed-----Order has been paid.");
                 exit('SUCCESS');
             }
             else{
-                self::xielog("$order_id-----completed-----{$res['msg']}");
+                $this->xielog("$order_id-----completed-----{$res['msg']}");
             }
 
 
         }
         else if ($d["status"] == 2) {
-            $res = ServiceShopify::orderCancel(['app_key'=>$appInfo["app_key"],'order_id'=>$d["clientOrderSn"],'reason'=>'other']);
+            $res = (new ServiceShopify())->orderCancel(['app_key'=>$appInfo["app_key"],'order_id'=>$d["clientOrderSn"],'reason'=>'other']);
             if($res['code'] === 1) {
-                self::xielog("$order_id-----failed-----Order is failed.");
+                $this->xielog("$order_id-----failed-----Order is failed.");
                 exit('SUCCESS');
             }
             else{
-                self::xielog("$order_id-----failed-----{$res['msg']}");
+                $this->xielog("$order_id-----failed-----{$res['msg']}");
             }
 
         }
         else if ($d["status"] == 3) {
-            $res = ServiceShopify::orderCancel(['app_key'=>$appInfo["app_key"],'order_id'=>$d["clientOrderSn"],'reason'=>'customer']);
+            $res = (new ServiceShopify())->orderCancel(['app_key'=>$appInfo["app_key"],'order_id'=>$d["clientOrderSn"],'reason'=>'customer']);
             if($res['code'] === 1) {
-                self::xielog("$order_id-----cancelled-----Order is cancelled.");
+                $this->xielog("$order_id-----cancelled-----Order is cancelled.");
                 exit('SUCCESS');
             }
             else{
-                self::xielog("$order_id-----cancelled-----{$res['msg']}");
+                $this->xielog("$order_id-----cancelled-----{$res['msg']}");
             }
         }
 
-        self::xielog("$order_id-----AirSwiftPay Payment Status:{$d["status"]}.");
+        $this->xielog("$order_id-----AirSwiftPay Payment Status:{$d["status"]}.");
         exit('failed');
     }
 

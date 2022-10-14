@@ -63,7 +63,7 @@
     10: function(e, t, n) {
         "use strict";
         t.a = {
-            baseURL: "https://bp.rome9.com/",
+            baseURL: "https://shopify.airswift.io/",
             key_apikey: "data-api",
             key_payment_name: "AirSwiftPay",
         }
@@ -80,7 +80,7 @@
                     n.style = "width:100px;height:30px;outline:none",
                     n.onclick = function() {
                         let formData = {
-                            app_key:document.querySelector("#airswift_paynemt").getAttribute(o.a.key_apikey),
+                            app_key:document.querySelector("#asw_pop").getAttribute(o.a.key_apikey),
                             order_id:window.Shopify.checkout.order_id,
                         };
 
@@ -111,7 +111,6 @@
                 return n
             };
         document.addEventListener("DOMContentLoaded", (function() {
-            console.log('aa',Shopify.checkout);
             let e, t, n, i = document.querySelector(".payment-method-list__item__info");
             if (i && i.textContent && i.textContent.toLowerCase().includes(o.a.key_payment_name.toLowerCase())) {
                 let a = {
@@ -121,7 +120,7 @@
                         continueButton: document.querySelector(".step__footer__continue-btn"),
                         checkMarkIcon: document.querySelector(".os-header__hanging-icon"),
                     },
-                    d = document.querySelector("#airswift_paynemt").getAttribute(o.a.key_apikey);
+                    d = document.querySelector("#asw_pop").getAttribute(o.a.key_apikey);
                 if (d === null || d.length <= 0){
                     return a.mainHeader.innerText = "Choose another payment method",
                         e = a.orderConfirmed,

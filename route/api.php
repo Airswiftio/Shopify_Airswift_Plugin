@@ -11,9 +11,11 @@
 use think\facade\Route;
 
 Route::group( function(){
+    Route::get('/', 'api/index');
+
     Route::group( function(){
         Route::post('api-create_payment', 'api/create_order');
-        Route::get('callback', 'api/callback');
+        Route::any('callback', 'api/callback');
     });
 
     Route::group('app', function(){
