@@ -12,15 +12,61 @@ class ServiceOrder extends Base
             return $res;
         }
         $data = $res['data'];
-        if(env('APP_MODE','') === 'production'){
-            //At present, the AirSwift payment gateway only supports the conversion of USD to cryptocurrencies, so it is necessary to determine
-            if(strtolower($data['currencyCode']) !== 'usd'){
-                return r_fail("AirSwift Payment gateway only supports USD!");
+        $total_amount = $data['totalPriceSet']['shopMoney']['amount'];
+
+        //Currency exchange rate conversion, all currencies are converted to USD
+        if(strtolower($data['currencyCode']) !== 'usd'){
+            //all currencies are converted to USD
+            // api.5
+            $d1 = [
+                'do'=>'GET',
+//                'url'=>'https://api.apilayer.com/exchangerates_data/convert?to=USD&from=CNY&amount=1',
+                'url'=>"https://api.apilayer.com/exchangerates_data/convert?to=USD&from={$data['currencyCode']}&amount={$total_amount}",
+                'qt'=>[
+                    'apikey: vIc43zNe7qA5yVPpAb560Uo4wXnPhrdA',
+                    'Content-Type: text/plain'
+                ]
+            ];
+            $res = json_decode(chttp($d1),true);
+            if($res['success'] === true){
+                $total_amount = $res['result'];
             }
-            if(strtolower($data['totalPriceSet']['shopMoney']['currencyCode']) !== 'usd'){
-                return r_fail("AirSwift Payment gateway only supports USD!");
+            else {
+                $this->xielog("$order_id-----{$res['message']}");
+                return r_fail('Currency exchange rate conversion failed!');
             }
+            // api.11
+            /*$d = [
+                'do'=>'POST',
+                'url'=>'https://neutrinoapi.net/convert',
+                'data'=>[
+                    'from-value'=>$total_amount,
+                    'from-type'=>$data['currencyCode'],
+                    'to-type'=>"USD",
+                ],
+                'qt'=>[
+                    'user-id: 644577519@qq.com',
+                    'api-key: VzLCqZFwsJVqo2BlcICVMcP06u7PmLhsMT5YzlnDSUq3iHTL',
+                ]
+            ];
+            $res = json_decode(chttp($d),true);
+            if($res['valid'] === true){
+                $total_amount = $res['result'];
+            }
+            else{
+                return r_fail('Currency exchange rate conversion failed!');
+            }*/
         }
+
+        /* if(env('APP_MODE','') === 'production'){
+             //At present, the AirSwift payment gateway only supports the conversion of USD to cryptocurrencies, so it is necessary to determine
+             if(strtolower($data['currencyCode']) !== 'usd'){
+                 return r_fail("AirSwift Payment gateway only supports USD!");
+             }
+             if(strtolower($data['totalPriceSet']['shopMoney']['currencyCode']) !== 'usd'){
+                 return r_fail("AirSwift Payment gateway only supports USD!");
+             }
+         }*/
 
         //Get appkey collection information
         $appInfo = (new ServiceShopify())->getAppInfo($d['app_key']);
@@ -38,18 +84,16 @@ class ServiceOrder extends Base
             $msg = "AirSwiftPay's appSecret is not exist!";
             $this->xielog("$order_id-----$msg");
             return r_fail('Something went wrong, please contact the merchant for handling!');
-
         }
 
-        //Create payment todo 暂时只支持美元订单
+        //Create payment
+        $order_id = '999'.time();
         $appKey = $appInfo['app_key'];
         $tradeType = 0;
         $basicsType = 1;
         $currency_unit = "USDT";
         $nonce = mt_rand(100000,999999);
         $timestamp = floor(microtime(true) * 1000);
-        $total_amount = $data['totalPriceSet']['shopMoney']['amount'];
-//                $total_amount = 0.01;
         $appSecret = $appInfo['app_secret'];
         $clientOrderSn = $order_id;
         $hash_value = md5($appKey.$nonce.$timestamp.$currency_unit.$total_amount.$order_id.$basicsType.$tradeType.$appSecret);
@@ -62,6 +106,7 @@ class ServiceOrder extends Base
             'amount' => $total_amount,
             'remarks' => $appInfo['app_key'],
         );
+
         $options = array(
             'http' => array(
                 'header'  => "Content-type: application/json;charset=UTF-8",

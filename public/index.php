@@ -11,7 +11,6 @@
 
 // [ 应用入口文件 ]
 namespace think;
-var_dump(99);die;
 
 header("Access-Control-Allow-Origin: *");
 header('Access-Control-Allow-Methods:*');
