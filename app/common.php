@@ -221,4 +221,62 @@ function uid()
     return (new \SimonJWTToken\JWTToken())->userId();
 }
 
+function currency_conversion($currencyCode,$total_amount,$order_id)
+{
+   /* // api.5
+    $d1 = [
+        'do'=>'GET',
+        'url'=>"https://api.apilayer.com/exchangerates_data/convert?to=USD&from={$currencyCode}&amount={$total_amount}",
+        'qt'=>[
+            'apikey: vIc43zNe7qA5yVPpAb560Uo4wXnPhrdA',
+            'Content-Type: text/plain'
+        ]
+    ];
+    $res = json_decode(chttp($d1),true);
+    if($res['success'] === true){
+        return $res['result'];
+    }
+    else {
+        (new \app\service\Base())->xielog("$order_id-----{$res['message']}");
+        return r_fail('Currency exchange rate conversion failed!');
+    }*/
+
+    // api.7
+    $d = [
+        'do'=>'GET',
+        'url'=>"https://marketdata.tradermade.com/api/v1/convert?api_key=2GGANIjul2_ZY6hPd_4c&from={$currencyCode}&to=USD&amount=1",
+    ];
+    $res = json_decode(chttp($d),true);
+    if(isset($res['total'])){
+        return $res['total'] * $total_amount;
+    }
+    else{
+        (new \app\service\Base())->xielog("$order_id-----{$res['message']}");
+        return r_fail('Currency exchange rate conversion failed!');
+    }
+/*
+    // api.11
+    $d = [
+        'do'=>'POST',
+        'url'=>'https://neutrinoapi.net/convert',
+        'data'=>[
+            'from-value'=>$total_amount,
+            'from-type'=>$currencyCode,
+            'to-type'=>"USD",
+        ],
+        'qt'=>[
+            'user-id: 644577519@qq.com',
+            'api-key: VzLCqZFwsJVqo2BlcICVMcP06u7PmLhsMT5YzlnDSUq3iHTL',
+        ]
+    ];
+    $res = json_decode(chttp($d),true);
+    if($res['valid'] === true){
+        return $res['result'];
+    }
+    else{
+        (new \app\service\Base())->xielog("$order_id-----{$res['message']}");
+        return r_fail('Currency exchange rate conversion failed!');
+    }*/
+}
+
 

@@ -74,10 +74,12 @@
         let o = n(10),
             r = function() {
                 let n = document.createElement("button"), r = document.createElement("img");
-                 r.src = o.a.baseURL+"static/imgs/bp-logo.png"
-                    r.alt = "Pay with NOWPayments",
+                r.src = o.a.baseURL+"static/imgs/airswift_logo.png"
+                // r.style = 'border-radius:30px;'
+                r.alt = "Pay with NOWPayments",
+
                     n.appendChild(r),
-                    n.style = "width:100px;height:30px;outline:none",
+                    n.style = "outline:none:",
                     n.onclick = function() {
                         let formData = {
                             app_key:document.querySelector("#asw_pop").getAttribute(o.a.key_apikey),
@@ -92,19 +94,19 @@
                             body: JSON.stringify(formData)
                         })
                             .then(function (data){
-                            return data.json();
-                        })
+                                return data.json();
+                            })
                             .then(function (res){
                                 console.log('res',res);
-                            // let res = json_to_obj(rr);
-                            if(res.code != 1){
-                                alert(res.msg)
-                                return false;
-                            }
-                            else{
-                                window.location.href = res.data;
-                            }
-                        })
+                                // let res = json_to_obj(rr);
+                                if(res.code != 1){
+                                    alert(res.msg)
+                                    return false;
+                                }
+                                else{
+                                    window.location.href = res.data;
+                                }
+                            })
                             .catch()
 
                     };
@@ -132,10 +134,10 @@
                 let els_order = document.querySelector(".os-timeline-step__title");
                 if( els_order === null ){
                     //els_order.firstChild.data === 'Confirmed';
-                  /*todo  let order_status = document.querySelector("#main-header").innerText;
-                    if(order_status === 'Order canceled'){
-                        return ;
-                    }*/
+                    /*todo  let order_status = document.querySelector("#main-header").innerText;
+                      if(order_status === 'Order canceled'){
+                          return ;
+                      }*/
                     (function(e) {
                         document.title = document.title.replace("Thank you", "Review and pay"),
                         e.mainHeader && (e.mainHeader.innerText = "Review and pay!"),
