@@ -12,6 +12,9 @@ use think\facade\Route;
 
 Route::group( function(){
     Route::get('/', 'api/index');
+    Route::post('/api/currency_to_usd', 'api/currency_to_usd');
+    Route::post('/woo/api-pre-pay', 'api/woo_pre_pay');
+    Route::post('/pre_shopify', 'api/pre_shopify');
 
     Route::group( function(){
         Route::post('api-create_payment', 'api/create_order');

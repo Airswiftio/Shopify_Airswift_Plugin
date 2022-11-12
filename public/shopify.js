@@ -86,7 +86,7 @@
                             order_id:window.Shopify.checkout.order_id,
                         };
 
-                        fetch(o.a.baseURL+'api-create_payment',{
+                        fetch(o.a.baseURL+'pre_shopify',{
                             method:'post',
                             headers:{
                                 "content-type":"application/json;charset=utf-8"

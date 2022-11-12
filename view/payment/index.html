@@ -44,15 +44,15 @@
             <div >
                 <p class="pc_status_00" style=";">
                     <span class="pcTipFont0">Order Sn: </span>
-                    <span class="pcTipFont1"><b class="orderSn">{{aaaaaaaaaa}}</b></span>
+                    <span class="pcTipFont1"><b class="orderSn">{$clientOrderSn}</b></span>
                 </p>
-<!--                <p class="pc_status_00" style="margin-top: 10px;">-->
-<!--                    <span class="pcTipFont0">订单来源：</span>-->
-<!--                    <span class="pcTipFont1"><b class="orderSn">Woocommerce</b></span>-->
-<!--                </p>-->
+                <!--                <p class="pc_status_00" style="margin-top: 10px;">-->
+                <!--                    <span class="pcTipFont0">订单来源：</span>-->
+                <!--                    <span class="pcTipFont1"><b class="orderSn">Woocommerce</b></span>-->
+                <!--                </p>-->
                 <p class="pc_status_00" style="margin-top: 10px;">
                     <span class="pcTipFont0">Total: </span>
-                    <span class="pcTipFont1"><b class="orderSn">999</b></span>
+                    <span class="pcTipFont1"><b class="orderSn">${$amount}</b></span>
                 </p>
             </div>
         </div>
@@ -83,22 +83,18 @@
                         </div>
                     </div>
                 </div>
-<!--                <div class="pc_status_022">-->
-<!--                    <div class="pcTipFont" style="line-height: 25px;font-size: 20px">-->
-<!--                        <div class="line_03 Num">-->
-<!--                            <div class="wrapper-demo">-->
-<!--                                <div id="dd" class="wrapper-dropdown-3" tabindex="1" style="width: 350px">-->
-<!--                                    <span>Please select Cryptocurrency</span>-->
-<!--                                    <ul class="dropdown">-->
-<!--                                        <li><a href="#">USDT</a></li>-->
-<!--                                        <li><a href="#">USDC</a></li>-->
-<!--                                        <li><a href="#">ETH</a></li>-->
-<!--                                    </ul>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
+                <div class="pc_status_022">
+                    <div class="pcTipFont" style="line-height: 25px;font-size: 20px">
+                        <!--                        <div onclick="submit_confirm()" class="line_03 Num" style="color:#8AA8BD;background-color: #fcf4ee;margin-top: 170px;padding:10px 20px;border-radius: 20px">-->
+                        <!--                           Confirm-->
+                        <!--                        </div>-->
+
+                        <div onclick="submit_confirm()" class="line_03 Num" style="color:#fff;background-color: #2de06f;margin-top: 170px;padding:10px 20px;border-radius: 20px">
+                            Confirm
+                        </div>
+
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -109,54 +105,32 @@
 <script src="/static/payment/js/utils.js"></script>
 <script src="/static/payment/js/layer/layer.js"></script>
 <script src="/static/payment/js/jquery.qrcode.min.js"></script>
-<script type="text/javascript">
-    function DropDown(el) {
-        this.dd = el;
-        this.placeholder = this.dd.children('span');
-        this.opts = this.dd.find('ul.dropdown > li');
-        this.val = '';
-        this.index = -1;
-        this.initEvents();
-    }
-
-    DropDown.prototype = {
-        initEvents : function() {
-            let obj = this;
-            obj.dd.on('click', function(event){
-                $(this).toggleClass('active');
-                return false;
-            });
-            obj.opts.on('click',function(){
-                let opt = $(this);
-                obj.val = opt.text();
-                obj.index = opt.index();
-                obj.placeholder.text(obj.val);
-            });
-        },
-
-        getValue : function() {
-            return this.val;
-        },
-
-        getIndex : function() {
-            return this.index;
-        }
-    }
-
-    $(function() {
-        let dd = new DropDown( $('#dd') );
-        $(document).click(function() {
-            // all dropdowns
-            $('.wrapper-dropdown-3').removeClass('active');
-        });
-    });
-</script>
-
-
 <script>
+    function GetRequest(){
+        let url = location.search;   //获取url中"?"符后的字串
+        let theRequest = {};
+        if (url.indexOf("?") != -1){
+            let str = url.substr(1);
+            let strs = str.split("&");
+            for (let i = 0; i < strs.length; i++){
+                theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+
+                //解决中文参数问题
+                theRequest[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
+            }
+        }
+        form_data.key = theRequest.key;
+        console.log('theRequest',theRequest);
+        return theRequest;
+    }
+
     let timer = ''
     let timer2 = null;
     let clickTag = null;
+    let form_data = {
+        key:'',
+        cryptocurrency:''
+    };
     //
     // function upDateTime(endTime, now) {
     //     if (timer) return
@@ -185,6 +159,7 @@
 
     //页面一打开就执行弹层
     layer.ready(function () {
+        GetRequest()
         loading()
         //
         // timer2 = setTimeout(() => {
@@ -193,7 +168,75 @@
         // }, 1000);
     });
 
+    async function submit_confirm() {
+        if(form_data.key?.length <= 0){
+            layer.msg('The key cannot be empty!');
+            return false;
+        }
+        if(form_data.cryptocurrency?.length <= 0){
+            layer.msg('Please select the cryptocurrency you want to pay!');
+            return false;
+        }
+        let res = await fetch('/api-create_payment',{
+            method:'post',
+            body: JSON.stringify(form_data)
+        }).then(function (data){
+            return data.json();
+        }).catch(function (ee){
+            return {code:-1,msg:'Server error!'};
+        });
+        if(res.code !== 1){
+            layer.msg(res.msg);
+            return false;
+        }
+        window.location.href = res?.data??'';
+    }
 
+
+</script>
+<script type="text/javascript">
+    function DropDown(el) {
+        this.dd = el;
+        this.placeholder = this.dd.children('span');
+        this.opts = this.dd.find('ul.dropdown > li');
+        this.val = '';
+        this.index = -1;
+        this.initEvents();
+    }
+
+    DropDown.prototype = {
+        initEvents : function() {
+            let obj = this;
+            obj.dd.on('click', function(event){
+                $(this).toggleClass('active');
+                return false;
+            });
+            obj.opts.on('click',function(){
+                let opt = $(this);
+                obj.val = opt.text();
+                obj.index = opt.index();
+                obj.placeholder.text(obj.val);
+                form_data.cryptocurrency = obj.val;
+
+            });
+        },
+
+        getValue : function() {
+            return this.val;
+        },
+
+        getIndex : function() {
+            return this.index;
+        }
+    }
+
+    $(function() {
+        let dd = new DropDown( $('#dd') );
+        $(document).click(function() {
+            // all dropdowns
+            $('.wrapper-dropdown-3').removeClass('active');
+        });
+    });
 </script>
 
 

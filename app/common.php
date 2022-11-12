@@ -221,7 +221,7 @@ function uid()
     return (new \SimonJWTToken\JWTToken())->userId();
 }
 
-function currency_conversion($currencyCode,$total_amount,$order_id)
+function currency_conversion($currencyCode,$total_amount,$order_id = 0)
 {
    /* // api.5
     $d1 = [
