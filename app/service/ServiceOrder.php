@@ -164,62 +164,117 @@ class ServiceOrder extends Base
     }
 
     public function callBack($d = []){
-
+        $this->xielog($d);
         if(empty($d) || !isset($d['sign']) || !isset($d['clientOrderSn']) || !isset($d['coinUnit']) || !isset($d['amount']) || !isset($d['rate']) ) {
-            $this->xielog($d);
             exit('failed');
         }
-        else{
-            $this->xielog($d);
-        }
+        $order_id = $d["clientOrderSn"];
 
         //Get appkey collection information
         $appInfo = (new ServiceShopify())->getAppInfo($d['remarks']);
         if(empty($appInfo)){
-            return r_fail('app_key error.');
+            $d['err_msg'] = $order_id.' app_key error.';
+            $this->xielog($d);
+            exit('failed');
         }
 
         //Verify signature
         $sign = md5($appInfo['sign_key'].$d['clientOrderSn'].$d['coinUnit'].$d['amount'].$d['rate']);
         if(strtolower($sign) !== strtolower($d['sign'])){
-            $d['err_msg'] = 'sign error:'.$sign;
+            $d['err_msg'] = $order_id.' sign error:'.$sign;
             $this->xielog($d);
             exit('failed');
         }
 
-//        $order_id = explode('_',$d["clientOrderSn"])[0];
-        $order_id = $d["clientOrderSn"];
         if ($d["status"] == 1) {
-            $res = (new ServiceShopify())->orderMarkPaid(['app_key'=>$appInfo["app_key"],'order_id'=>$order_id]);
-            if($res['code'] === 1){
-                $this->xielog("$order_id-----completed-----Order has been paid.");
-                exit('SUCCESS');
+            // payStatus = 0 is pending, 1 is received, 2 is cancel, 3 is not enough payment, 4 is over pay
+            // Query the order details. When the payStatus is 1 or 4, the order is marked as paid (completed)
+            $orderSn = $d['orderSn'];
+            $appKey = $appInfo['app_key'];
+            $appSecret = $appInfo['app_secret'];
+            $nonce = mt_rand(100000,999999);
+            $timestamp = floor(microtime(true) * 1000);
+            $sign = md5($appKey.$nonce.$timestamp.$appSecret);
+            $url = "https://order.airswift.io/docking/order/detail/{$orderSn}?appKey={$appKey}&sign={$sign}&timestamp={$timestamp}&nonce={$nonce}";
+            $d = [
+                'do'=>'POST',
+                'url'=>$url,
+                'data'=>json_encode([]),
+                'qt'=>[
+                    'Content-type: application/json;charset=UTF-8'
+                ]
+            ];
+            $res1 = json_decode(chttp($d),true);
+            $message = [
+                'order_id'=>$order_id,
+                'status'=>'completed',
+                'order'=>$res1['data'],
+            ];
+            if($res1['data']['payStatus'] == 1 || $res1['data']['payStatus'] == 4){
+                $res = (new ServiceShopify())->orderMarkPaid(['app_key'=>$appInfo["app_key"],'order_id'=>$order_id]);
+                if($res['code'] === 1){
+                    $message['msg'] = 'Order has been paid.';
+                    $this->xielog($message);
+                    exit('SUCCESS');
+                }
+                else{
+                    $message['msg'] =$res['msg'];
+                    $this->xielog($message);
+                }
+            }
+            elseif($res1['data']['payStatus'] ==3){
+                $message['msg'] ='not enough payment';
+                $this->xielog($message);
+                $res = (new ServiceShopify())->orderCancel(['app_key'=>$appInfo["app_key"],'order_id'=>$order_id,'reason'=>'other']);
+                if($res['code'] === 1){
+                    $message['msg'] = 'Order has been paid(not enough payment).';
+                    $this->xielog($message);
+                    exit('SUCCESS');
+                }
+                else{
+                    $message['msg'] =$res['msg'];
+                    $this->xielog($message);
+                }
             }
             else{
-                $this->xielog("$order_id-----completed-----{$res['msg']}");
+                $message['msg'] ='unknow error';
+                $this->xielog($message);
+//                exit('SUCCESS');
             }
-
-
         }
         else if ($d["status"] == 2) {
+            $message = [
+                'order_id'=>$order_id,
+                'status'=>'failed',
+                'order'=>$d,
+            ];
             $res = (new ServiceShopify())->orderCancel(['app_key'=>$appInfo["app_key"],'order_id'=>$order_id,'reason'=>'other']);
             if($res['code'] === 1) {
-                $this->xielog("$order_id-----failed-----Order is failed.");
+                $message['msg'] ='Order is failed.';
+                $this->xielog($message);
                 exit('SUCCESS');
             }
             else{
-                $this->xielog("$order_id-----failed-----{$res['msg']}");
+                $message['msg'] =$res['msg'];
+                $this->xielog($message);
             }
 
         }
         else if ($d["status"] == 3) {
+            $message = [
+                'order_id'=>$order_id,
+                'status'=>'cancelled',
+                'order'=>$d,
+            ];
             $res = (new ServiceShopify())->orderCancel(['app_key'=>$appInfo["app_key"],'order_id'=>$order_id,'reason'=>'customer']);
             if($res['code'] === 1) {
-                $this->xielog("$order_id-----cancelled-----Order is cancelled.");
+                $message['msg'] ='Order is cancelled.';
+                $this->xielog($message);
                 exit('SUCCESS');
             }
             else{
-                $this->xielog("$order_id-----cancelled-----{$res['msg']}");
+                $message['msg'] =$res['msg'];
+                $this->xielog($message);
             }
         }
 

@@ -11,6 +11,8 @@
 use think\facade\Route;
 
 Route::group( function(){
+    Route::post('wlog', 'api/wlog');
+
     Route::get('/', 'api/index');
     Route::post('/api/currency_to_usd', 'api/currency_to_usd');
     Route::post('/woo/api-pre-pay', 'api/woo_pre_pay');
