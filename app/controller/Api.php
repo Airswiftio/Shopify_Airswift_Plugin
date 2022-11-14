@@ -6,7 +6,6 @@ use think\Exception;
 class Api extends Base
 {
     public function index(){
-        return md5('0x08830907F2e2D20A5CB37eE9E0A8BDf8c06e3508');
        return 'Hello!';
     }
 

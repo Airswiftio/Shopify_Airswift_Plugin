@@ -47,9 +47,10 @@ class ServiceOrder extends Base
         }
 
         //Currency exchange rate conversion, all currencies are converted to USD
-        if(strtolower($order_data['currencyCode']) !== 'usd'){
+        $currencyCode = strtoupper($order_data['currencyCode']);
+        if(strtolower($currencyCode) !== 'usd'){
             //all currencies are converted to USD
-            $res = currency_conversion($order_data['currencyCode'],$total_amount,$order_id);
+            $res = currency_conversion($currencyCode,$total_amount,$order_id);
             if(isset($res['code']) && $res['code'] === -1){
                 return $res;
             }
@@ -95,9 +96,6 @@ class ServiceOrder extends Base
 
     }
     public function createPayment($d=[]){
-        return r_fail('The key cannot be empty22!');
-        dd($d);
-
         $d['key'] = $d['key']??'';
         $d['cryptocurrency'] = strtoupper($d['cryptocurrency']??'');
         if(empty($d['key'])){
@@ -132,7 +130,7 @@ class ServiceOrder extends Base
         $currency_unit = $d['cryptocurrency'];
         $nonce = mt_rand(100000,999999);
         $timestamp = floor(microtime(true) * 1000);
-        $total_amount = $data['amount'];
+        $total_amount = ceil($data['amount']*100)/100;
 //        $clientOrderSn = $order_id.'_'.mt_rand(100000,999999);
         $clientOrderSn = $order_id;
         $hash_value = md5($appKey.$nonce.$timestamp.$currency_unit.$total_amount.$clientOrderSn.$basicsType.$tradeType.$appSecret);
@@ -159,8 +157,8 @@ class ServiceOrder extends Base
             $this->xielog("$order_id-----$msg".json_encode($d));
             return r_fail($php_result['message']);
         } else {
-            $payQrUrl_key = $data['source'].'payQrUrl_'.$order_id;
-            Cache::set($payQrUrl_key,$php_result['data'],30 * 60);
+            $payQrUrl_key = $data['source'].'_payQrUrl_'.$order_id;
+            Cache::set($payQrUrl_key,['url'=>$php_result['data'],'time'=>time()],24*60*60);
             return r_ok('ok', $php_result['data']);
         }
     }
@@ -229,90 +227,6 @@ class ServiceOrder extends Base
         exit('failed');
     }
 
-    public function aa(){
-
-        //Check whether the appKey and appSecret is configured
-        if(empty($this->appKey)){
-            $msg = "AirSwiftPay's appKey is not set!";
-            $order->add_order_note($msg);
-            return ['result'=>'success', 'messages'=>home_notice('Something went wrong, please contact the merchant for handling!')];
-        }
-        if(empty($this->appSecret)){
-            $msg = "AirSwiftPay's appSecret is not set!";
-            $order->add_order_note($msg);
-            return ['result'=>'success', 'messages'=>home_notice('Something went wrong, please contact the merchant for handling!')];
-        }
-        $total_amount = $order->get_total();
-        $paymentCurrency = strtolower($order->get_currency());
-        $d = [
-            'do'=>'POST',
-            'url'=>"https://shopify.airswift.io/api/currency_to_usd",
-            'data'=>[
-                'order_id'=>$order_id,
-                'currencyCode'=>$paymentCurrency,
-                'total_amount'=>$total_amount,
-            ]
-        ];
-        $res = json_decode(chttp($d),true);
-        if(!isset($res['code']) || $res['code'] !== 1){
-            $order->add_order_note($res['msg']);
-            return ['result'=>'success', 'messages'=>home_notice('Something went wrong, please contact the merchant for handling!')];
-        }
-        $total_amount = $res['data'];
-
-        //pre pay
-        $appKey = $this->appKey;
-        $tradeType = 0;
-        $basicsType = 1;
-        $currency_unit = "USDT";
-        $nonce = mt_rand(100000,999999);
-//                $customer_id = $order->customer_id;
-//                $order_note = $order->customer_note;
-        $timestamp = floor(microtime(true) * 1000);
-        $appSecret = $this->appSecret;
-        $clientOrderSn = $order_id;
-        $sign = md5($appKey.$nonce.$timestamp.$currency_unit.$total_amount.$order_id.$basicsType.$tradeType.$appSecret);
-        $data = [
-            'appKey' => $appKey,
-            'order_id' => $order_id,
-            'appSecret' => $appSecret,
-            'sign' => $sign,
-            'timestamp' => $timestamp,
-            'nonce' => $nonce,
-            'clientOrderSn' => $clientOrderSn,
-            'tradeType' => $tradeType,
-            'coinUnit' =>$currency_unit,
-            'basicsType' => $basicsType,
-            'amount' => $total_amount,
-//                    'remarks' => $order_note,
-        ];
-
-        $d = [
-            'do'=>'POST',
-            'url'=>"https://shopify.airswift.io/woo/api-pre-pay",
-            'data'=>$data
-        ];
-        $res = json_decode(chttp($d),true);
-        if(!isset($res['code']) || $res['code'] !== 1){
-            $order->add_order_note($res['msg']);
-            return ['result'=>'success', 'messages'=>home_notice('Something went wrong, please contact the merchant for handling3!')];
-        }
-        else{
-            if($res['data']['status'] === 'not_started'){
-                $order->update_status('processing',  __( 'Awaiting AirSwift Payment', 'airswift-pay-woo'));
-            }
-//                    $order->reduce_order_stock();
-//                    WC()->cart->empty_cart();
-            return array(
-                'result'   => 'success',
-                'redirect' => $res['data']['url'],
-                // Redirects to the order confirmation page:
-                // 'redirect' => $this->get_return_url($order)
-            );
-        }
-    }
-
-
     public function pre_pay($d=[]){
         $order_id = $d['order_id'] ?? 0;
         if(empty($order_id)){
@@ -328,10 +242,10 @@ class ServiceOrder extends Base
             return r_fail('Source Error!');
         }
         $payQrUrl_key = $source.'payQrUrl_'.$order_id;
+        $data_key = md5('os_'.$payQrUrl_key);
         $data =  Cache::get($payQrUrl_key);
         $nowTime = time();
         $expire_time = $this->pay_url_expire_time;
-        $data_key = md5('os_'.$payQrUrl_key);
         Cache::set($data_key,$d,24*60*60);
         if(!is_null($data)){
             $payQrUrl = $data['url'];

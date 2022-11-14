@@ -52,7 +52,7 @@
                 <!--                </p>-->
                 <p class="pc_status_00" style="margin-top: 10px;">
                     <span class="pcTipFont0">Total: </span>
-                    <span class="pcTipFont1"><b class="orderSn">${$amount}</b></span>
+                    <span class="pcTipFont1"><b class="orderSn">$<?php echo ceil($amount*100)/100;?></b></span>
                 </p>
             </div>
         </div>
@@ -89,7 +89,7 @@
                         <!--                           Confirm-->
                         <!--                        </div>-->
 
-                        <div onclick="submit_confirm()" class="line_03 Num" style="color:#fff;background-color: #2de06f;margin-top: 170px;padding:10px 20px;border-radius: 20px">
+                        <div onclick="submit_confirm()" class="line_03 Num" style="color:#fff;background-color: #2de06f;margin-top: 170px;padding:10px 30px;border-radius: 20px">
                             Confirm
                         </div>
 
@@ -179,6 +179,9 @@
         }
         let res = await fetch('/api-create_payment',{
             method:'post',
+            headers:{
+                "content-type":"application/json;charset=utf-8"
+            },
             body: JSON.stringify(form_data)
         }).then(function (data){
             return data.json();
