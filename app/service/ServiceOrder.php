@@ -9,8 +9,7 @@ class ServiceOrder extends Base
 {
 
     private $pay_url_expire_time = 30 * 60;
-    private $signKey = 'b412a85ad8b2c5325d280ae78bfb7b5a';
-    private $cryptocurrency =['USDC','USDT','ETH'];
+//    private $cryptocurrency =['USDC','USDT','ETH','CNT'];
 
     public function preShopify($d=[]){
         $order_id = $d['order_id']??0;
@@ -101,7 +100,7 @@ class ServiceOrder extends Base
         if(empty($d['key'])){
             return r_fail('The key cannot be empty!');
         }
-        if(empty($d['cryptocurrency']) || !in_array($d['cryptocurrency'],$this->cryptocurrency)){
+        if(empty($d['cryptocurrency'])){
             return r_fail('Cryptocurrency error!');
         }
         $data =  Cache::get($d['key']);
