@@ -177,6 +177,7 @@ var jAlertButtonSureCSS = "height: 35px; line-height: 35px; padding: 0 20px; col
             r = function() {
                 let n = document.createElement("button"), r = document.createElement("img");
                 r.src = o.a.baseURL+"static/imgs/airswift_logo.png"
+                r.style = 'width:200px;'
                 // r.style = 'border-radius:30px;'
                 r.alt = "Pay with NOWPayments",
 
