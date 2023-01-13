@@ -1,6 +1,6 @@
 html,
 body {
-  background-color: #eee;
+  background-color: #ffffff;
 }
 
 /* // 当屏幕小于或等于 400px 时,页面中的 .box 都将被隐藏。 */
@@ -361,15 +361,19 @@ body {
 .pcTipFont0 {
   text-align: left;
   width: 100px;
-  font-size: 13px;
-  color: rgba(0, 0, 0, 0.6);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 27px;
+  color: rgba(0, 0, 0, 1);
 }
 
 .pcTipFont1 {
   text-align: left;
   width: 100px;
-  font-size: 13px;
-  color: rgba(0, 0, 0, 0.6);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 27px;
+  color: rgba(0, 0, 0, 1);
 }
 .pcTipFontWidth {
   display: inline-block;
@@ -401,6 +405,13 @@ body {
     padding: 0;
     max-width: 1000px;
     /* border-radius: 8px; */
+    background: #FFFFFF;
+    /*box-shadow: inset -1px -1px 0px rgba(24, 30, 54, 0.25), inset 1px 1px 0px rgba(180, 255, 255, 0.2);*/
+    /*backdrop-filter: blur(25px);*/
+    /* Note: backdrop-filter has minimal browser support */
+    border: 5px solid rgba(170, 170, 170, 0.2);
+
+    border-radius: 16px;
   }
   .pcHeader {
     margin: 0 auto;
@@ -424,12 +435,14 @@ body {
     font-weight: 600;
   }
   .body_header {
-    background: #fcf4ee;
+    background: #ffffff;
     border-radius: 16px 16px 0 0;
     /* width: 1000px; */
     height: 96px;
     display: flex;
     align-items: center;
+    border-bottom: 5px solid rgba(170, 170, 170, 0.2);
+
     /* height: 56px;
     margin-bottom: 30px;
     padding: 0 50px;
@@ -484,5 +497,27 @@ body {
     padding: 20px;
     background: #f9f8f8;
     border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+
+  .as_submit{
+    /* Gradient */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 52px;
+    gap: 12px;
+    background: linear-gradient(98.48deg, #8DFE59 -3.85%, #3ACBF6 35.75%, #6055FF 69.61%);
+    box-shadow: inset 0px 2px 0px rgba(255, 255, 255, 0.2), inset 0px -2px 0px rgba(59, 53, 146, 0.5);
+    border-radius: 80px;
+    width: 332px;
+
+    color:#fff;
+    /*background-color: #2de06f;*/
+    margin-top: 20px;
+    /*padding:10px 30px;*/
+    /*border-radius: 20px;*/
+    cursor: pointer
   }
 }
