@@ -108,6 +108,11 @@ class ServiceOrder extends Base
             return r_fail('The order does not exist!');
         }
         $order_id = $data['order_id'];
+        $payQrUrl_key = $data['source'].'_'.$d['cryptocurrency'].'_payQrUrl_'.$data['order_id'];
+        $data_url =  Cache::get($payQrUrl_key);
+        if(!is_null($data_url)){
+            return r_ok('ok',$data_url['url']);
+        }
 
         //Check whether the appKey and appSecret is exist
         if(empty($data['appKey'])){
@@ -158,7 +163,7 @@ class ServiceOrder extends Base
         } else {
 
             $this->xielog("CreatePayment-----".json_encode($d));
-            $payQrUrl_key = $data['source'].'_payQrUrl_'.$order_id;
+            $payQrUrl_key = $data['source'].'_'.$currency_unit.'_payQrUrl_'.$order_id;
             Cache::set($payQrUrl_key,['url'=>$php_result['data'],'time'=>time()],24*60*60);
             return r_ok('ok', $php_result['data']);
         }
@@ -298,7 +303,7 @@ class ServiceOrder extends Base
         else{
             return r_fail('Source Error!');
         }
-        $payQrUrl_key = $source.'payQrUrl_'.$order_id;
+        $payQrUrl_key = $source.$d['coinUnit'].'_payQrUrl_'.$order_id;
         $data_key = md5('os_'.$payQrUrl_key);
         $data =  Cache::get($payQrUrl_key);
         $nowTime = time();
