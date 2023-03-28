@@ -78,7 +78,7 @@ class Api extends Base
 
     public function wlog(){
         $d = input();
-        (new \app\service\Base())->xielog('woo--'.json_encode($d));
+        (new \app\service\Base())->xielog("woo--{$d['message1']}",$d);
     }
 
 

@@ -36,12 +36,12 @@ class ServiceOrder extends Base
         //Check whether the appKey and appSecret is exist
         if(empty($appInfo['app_key'])){
             $msg = "AirSwiftPay's appKey is not exist!";
-            $this->xielog("$order_id-----$msg".json_encode($d));
+            $this->xielog("$order_id-----$msg",$d);
             return r_fail('Something went wrong, please contact the merchant for handling1!');
         }
         if(empty($appInfo['app_secret'])){
             $msg = "AirSwiftPay's appSecret is not exist!";
-            $this->xielog("$order_id-----$msg".json_encode($d));
+            $this->xielog("$order_id-----$msg",$d);
             return r_fail('Something went wrong, please contact the merchant for handling2!');
         }
 
@@ -84,7 +84,7 @@ class ServiceOrder extends Base
         $data['source'] ='shopify';
         $res = $this->pre_pay($data);
         if(!isset($res['code']) || $res['code'] !== 1){
-            $this->xielog("$order_id-----{$res['msg']}".json_encode($d));
+            $this->xielog("$order_id-----{$res['msg']}",$d);
             return r_fail($res['msg']);
         }
         else{
@@ -117,12 +117,12 @@ class ServiceOrder extends Base
         //Check whether the appKey and appSecret is exist
         if(empty($data['appKey'])){
             $msg = "AirSwiftPay's appKey is not exist!";
-            $this->xielog("$order_id-----$msg".json_encode($d));
+            $this->xielog("$order_id-----$msg",$d);
             return r_fail('Something went wrong, please contact the merchant for handling1!');
         }
         if(empty($data['appSecret'])){
             $msg = "AirSwiftPay's appSecret is not exist!";
-            $this->xielog("$order_id-----$msg".json_encode($d));
+            $this->xielog("$order_id-----$msg",$d);
             return r_fail('Something went wrong, please contact the merchant for handling2!');
         }
 
@@ -158,11 +158,11 @@ class ServiceOrder extends Base
         $php_result = json_decode(chttp($d),true);
         if ($php_result['code'] !== 200) {
             $msg = "AirSwiftPay's createPayment failed!({$php_result['message']})";
-            $this->xielog("$order_id-----$msg".json_encode($d));
+            $this->xielog("$order_id-----$msg",$d);
             return r_fail($php_result['message']);
         } else {
 
-            $this->xielog("CreatePayment-----".json_encode($d));
+            $this->xielog("CreatePayment-----$order_id",$d);
             $payQrUrl_key = $data['source'].'_'.$currency_unit.'_payQrUrl_'.$order_id;
             Cache::set($payQrUrl_key,['url'=>$php_result['data'],'time'=>time()],24*60*60);
             return r_ok('ok', $php_result['data']);
@@ -170,7 +170,7 @@ class ServiceOrder extends Base
     }
 
     public function callBack($d = []){
-        $this->xielog($d);
+        $this->xielog("callBack1-----{$d['clientOrderSn']}",$d);
         if(empty($d) || !isset($d['sign']) || !isset($d['clientOrderSn']) || !isset($d['coinUnit']) || !isset($d['amount']) || !isset($d['rate']) ) {
             exit('failed');
         }
@@ -181,7 +181,7 @@ class ServiceOrder extends Base
         $appInfo = (new ServiceShopify())->getAppInfo($d['remarks']);
         if(empty($appInfo)){
             $d['err_msg'] = $order_id.' app_key error.';
-            $this->xielog($d);
+            $this->xielog("callBack2-----{$d['clientOrderSn']}",$d);
             exit('failed');
         }
 
@@ -189,7 +189,7 @@ class ServiceOrder extends Base
         $sign = md5($appInfo['sign_key'].$d['clientOrderSn'].$d['coinUnit'].$d['amount'].$d['rate']);
         if(strtolower($sign) !== strtolower($d['sign'])){
             $d['err_msg'] = $order_id.' sign error:'.$sign;
-            $this->xielog($d);
+            $this->xielog("callBack3-----{$d['clientOrderSn']}",$d);
             exit('failed');
         }
 
