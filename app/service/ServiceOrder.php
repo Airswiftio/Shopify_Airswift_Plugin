@@ -130,8 +130,8 @@ class ServiceOrder extends Base
         $nonce = mt_rand(100000,999999);
         $timestamp = floor(microtime(true) * 1000);
         $total_amount = ceil($data['amount']*100)/100;
-//        $clientOrderSn = $order_id.'_'.mt_rand(100000,999999);
-        $clientOrderSn = $order_id;
+        $clientOrderSn = $order_id.'_'.time();
+//        $clientOrderSn = $order_id;
         $hash_value = md5($appKey.$nonce.$timestamp.$currency_unit.$total_amount.$clientOrderSn.$basicsType.$tradeType.$appSecret);
         $url = "https://order.airswift.io/docking/order/create?appKey=$appKey&sign=$hash_value&timestamp=$timestamp&nonce=$nonce";
         $data1  = [
@@ -156,6 +156,8 @@ class ServiceOrder extends Base
             $this->xielog("$order_id-----$msg".json_encode($d));
             return r_fail($php_result['message']);
         } else {
+
+            $this->xielog("CreatePayment-----".json_encode($d));
             $payQrUrl_key = $data['source'].'_payQrUrl_'.$order_id;
             Cache::set($payQrUrl_key,['url'=>$php_result['data'],'time'=>time()],24*60*60);
             return r_ok('ok', $php_result['data']);
@@ -167,7 +169,8 @@ class ServiceOrder extends Base
         if(empty($d) || !isset($d['sign']) || !isset($d['clientOrderSn']) || !isset($d['coinUnit']) || !isset($d['amount']) || !isset($d['rate']) ) {
             exit('failed');
         }
-        $order_id = $d["clientOrderSn"];
+        $order_id = explode('_',$d['clientOrderSn'])[0];
+//        $order_id = $clientOrderSn;
 
         //Get appkey collection information
         $appInfo = (new ServiceShopify())->getAppInfo($d['remarks']);
