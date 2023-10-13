@@ -280,3 +280,56 @@ function currency_conversion($currencyCode,$total_amount,$order_id = 0)
 }
 
 
+function removeEmptyValues($value) {
+    return !empty($value) || ($value === 0 || $value === '0');
+}
+
+
+
+function encodeSHA256withRSA($content,$privateKey0=''){
+//    $privateKey0 = 'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCEebitt00kwsxtInxfuH+6SAbPZh+AS3Z6J+cUbeblZmdzwaxj0XBV8Lc0Yfm++Kn35mFWNtK5Y7MlSPpkVK3/ef3kLa50OhyplM5pI/U/HYDcIzvhV7u70JKWi7N0yYvUgiqQ4qieBo7lhT0YHH1L1PQQzCQyWo+EEXcXlK42qk7RRxzVs5HDFdwUZB/AQHtN01puehHLhtY7TBYtvoeOMB6Zs2g3c2EeBJ0Te6r8Rv8QY6SpdLm0gmIVXXP4Ro2oq4evL9GWbvoeU0+2MgkkpF1IGz5OfYRmMrfT+b0O0hNyrDDgfsbVRmK5+TnSs3ClNpGJWdeKlVVh2RY439bHAgMBAAECggEASPIZfhZb9S0KkeGWaMLYGkQE8/kAyY1EDNmiBX7K0HCF8Jipi0FNQRVOXBrDAaQ9O1LxMB76A7lhcNtxfQOf1/hdlGKPGFLTa5GT4xM4vOtLBGymUVwU9MNRpHICfAFq7LZMKAGW5YUo9Dtcu8UcPUBisEkoeU2ijw9q62IkV9a+oYuNANt3KOkAPcENOTgDoFCiUeFQhuz7dElzlq8ipXyPg3sRuz+zXoc6D2DS9FlFheZlPP1QkJY/BT8lgrQIutP9L0QctklXguZ9bjSFu0YNjBRZ1aqUAJFWLfcqHE5U5QqJi4WRUUpLKh8UfEnRhDnVA+Y2bmJarG12PwcSSQKBgQC/PGeYRjjjRuvsPSDLxaFCT7nUOAUSfXpdx4PZNVZnqjbYEtSbehCDFQxT7GfJcmoC3vFy1qcH5VtCaURjCKIpcgnmJGNOvsxqDzjMR/hsvRxMXJZFx6mbtFkWdS1PUKCH9gn8qAMgth6qUrg+4mYTeweimUFfUromJ6t+CFcM8wKBgQCxVvSnaQT+F0IRyYi6ffNt2r+lc26o0+TiK/h6X/AkV1PHw7JrHEAx2UBpvPBEVcGlWPs4gNQq3IFIouyaVxjCAPQMdBw55joXX+zVP1kzakdFZKR9aveCQ47MQh9OlTkFPrxVgU8SUeTbQMgQ++8kqwkijjRN0gYYcWdXeZXz3QKBgDL6KStgXL3JJA6/ZMStFAWXNxQpMsDxDfN9wdne6/+KUkBbFK21Zj1rGPQuKqR6iWPmhjp0meXy79bONNqpbIDb02O0A3z0Q41qLVvXO5PQ/YAlljFXvhCxjKX96mwgNArKPXNKXjsUESyaDF9G/qrmuuxPKiv8435USNS56GqdAoGAbtrDbo7IbykMxN+tF56595bBK+R/bQufzP3dgmnMTHtGRN6A/lGXk1GR4UcZDi5pMTnxOD3X4r8aFdS6gDQnpsY/yDUgm9TdxVTST+8cjHZH/QnPhRLDi2s9rVM8DLxc+3le8zg0vGfy3ledeHhz4gEEYdRwv6Ck7Mye4+B+KwUCgYEAkFHUMtk5Da1xzak6Ug5kfhrwctxvEHovkGY2fauIL4CbOJUsgPCNIJviGidm/y3JJRK4+C38+VfrvUwocyxag6mfUFLy3w71a4oHcsEBUHUTHjXQFW8o4vx9BDZWPEVLBe4W/vezr4kiOfp3wSYZWGIbT6wxPE3+g5v1X0EKXJc=';
+//    $privateKey = "-----BEGIN RSA PRIVATE KEY-----\n" .
+//        wordwrap($privateKey0, 64, "\n", true) .
+//        "\n-----END RSA PRIVATE KEY-----";
+//
+//    $key = openssl_get_privatekey($privateKey);
+//    openssl_sign($content, $signature, $key, OPENSSL_ALGO_SHA256);
+//    openssl_free_key($key);
+//    $sign = base64_encode($signature);
+
+
+    $privateKey = "-----BEGIN RSA PRIVATE KEY-----\n" .
+        wordwrap($privateKey0, 64, "\n", true) .
+        "\n-----END RSA PRIVATE KEY-----";
+    openssl_sign($content, $sign, $privateKey, OPENSSL_ALGO_SHA256);
+
+    $sign = base64_encode($sign);
+//    $sign = str_replace("\\", "",$sign);//session_key中可能出现\这个符号，会导致invalid错误
+    //    $sign = str_replace("\/", "",$sign);//session_key中可能出现\这个符号，会导致invalid错误
+    return $sign;
+
+    /*//定义私钥证书
+        $pri_key = "-----BEGIN PRIVATE KEY-----
+        MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCCung4X7n5Ns9VSDzk1U4mrTBGmrcd1YjXV98G+umPN8b1dHeKVJ26kDDrmDlLSAZkh4dpuxkmncSZSS1s8gUW8Xq4Reydpu6vMvhCrN3jPDrPPzgnZWxTa7JKvQK86yPgoCWSmjblas/0VGZ9wmFzYalan/pAP6PNCHWI7jHcGcwEfiJwww8IgfK589vtbajKYqvkJRIulSbowYtdpVZibkJGgYIcqHnNLwIqZjNAehvNMS/KksrDmSeBzbsl5J4YAgTVbTCtFGn84uGbEA6go7W2G0GVjlknZ8UgVPhBeVKRggPuE2Df0ENgudih02v5CCuVII1tkp0dH/s1SKbRAgMBAAECggEAYNwkozBaLQqtSDUD2VEqXIHJ2SZdMx+6CkQzHYrfbpwXMFqhD79uNoMLnCPnn524DthUPsS/99rBhgmwPJ59oug80zgL/ytmgi0zwMMwjGNd95yR0K7XOl/7dGDjHHLk3FQMQrk8n3MqrY+zeM6DQehEgL8zvlLo3Mu9uj0yeC8YBRynnm61SQlWCrgpHJqqkJbMsyOc5CRjsOSxxk4OjlPDTShOqpSDuUZmZyUunLqx32kMnyRSZQy3oVHy97WRSOi+ztHjXJyHI2neZwcf7hSsPrNfllJG6o1nA5U3VgS5ZOg0CvIMwnqRaOU3eiD3bAi9Ek9/0LT1k6PGVXzPIQKBgQDhI3ifmQXdknSJVkdlZCBInMnsF4u0ythJOXRaZthkS3lvRQrmJh1amF2vZErX7HLboqPLh66mGHBUpMimyDlRmdmkknexn1i6jcVQGppqwMli8eq3M8gsuG6+nLZMYAwi2tOsMX7tHWR9phIUQ81ZsjIyxx67AKKYAK6+ypbJtQKBgQCUpfiXOrGQhyw3QHyq5O57tnD1pfFa5wldPYzCEQuzFjILkeX6Ey99/P8g6cpOO6II5L7dRlrvd2c4VDZki4MUEaCR0jJgfoYcsTYKy9ou/J/deilbx1XkwBjpvqJFy/VbGr8fuGob0aZzagred6S9wrJI7Hn+COmIqqSzrKGqLQKBgQCVj+vlElH8NPvn9IIvkAmGU2osxiOQMiTm2B08pQ/h6OW+Dn7ED9P2SDwMdTLnKHPRBsWLQxK50ohlIqcNbPvvAqa8FnUfcX0PSXkn0tR8UKA4c/96PxMe6lLfm9na+P929CokPSlVue31LqrZ/YTgrml8pBz9G9nn4qQzqP/s9QKBgHoSgr/O15tVJp6JOtgtARxfiwxwpnB8Y1hK/5kv3mfHxnlx62ce8lWIuwwQcq8kkcCz+XpGGM+nQwEjRzfyykZk43RdJjnQLdrKPRNIrXkAxVhgxi402PjuOIdcom6nPGsA4AvwqlMGLKeDYkGoB4Y+qaLxcI2KTB6L5I4ZKvpRAoGAckVs/RUF6EI1zQraZ2L1+zowKTnHCYZdUT/fxXKUMVA34MDQYYY+SIIyZ3KJN2rfy+DwMYgRViU4OMsjqzfKQ6DkKmCC2sWtzVm1BvX5X/mB7RSeW5V9K5h2DNIBp/+yCuJVwSMnqwggB4c9PLQ018LMRPIprNd7Qr875D2z5K4=
+-----END PRIVATE KEY-----";
+        //开始加密
+        openssl_sign($sData,$encryptedData,$pri_key,OPENSSL_ALGO_SHA256);
+        //base编码加密后内容
+        $sign = base64_encode($encryptedData);*/
+}
+
+
+function wPost($url = '',$post_data = []){
+    $ch = curl_init();//初始化cURL
+
+    curl_setopt($ch,CURLOPT_URL,$url);//抓取指定网页
+    curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);//要求结果为字符串并输出到屏幕上
+    curl_setopt($ch,CURLOPT_POST,1);//Post请求方式
+//        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+    curl_setopt($ch,CURLOPT_POSTFIELDS,$post_data);//Post变量
+
+    $output = curl_exec($ch);//执行并获得HTML内容
+    curl_close($ch);//释放cURL句柄
+    return $output;
+}
+

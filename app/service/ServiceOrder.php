@@ -94,6 +94,118 @@ class ServiceOrder extends Base
         }
 
     }
+
+    public function pre_pay($d=[]){
+        $order_id = $d['order_id'] ?? 0;
+        if(empty($order_id)){
+            return r_fail('Order Id cannot be empty!');
+        }
+        if($d['source'] === 'woo'){
+            $source = 'woo_';
+        }
+        elseif($d['source'] === 'shopify'){
+            $source = 'shopify_';
+        }
+        else{
+            return r_fail('Source Error!');
+        }
+        $payQrUrl_key = $source.$d['coinUnit'].'_payQrUrl_'.$order_id;
+        $data_key = md5('os_'.$payQrUrl_key);
+        $data =  Cache::get($payQrUrl_key);
+        $nowTime = time();
+        $expire_time = $this->pay_url_expire_time;
+        Cache::set($data_key,$d,24*60*60);
+        if(!is_null($data)){
+            $payQrUrl = $data['url'];
+            if($nowTime - $data['time'] >= $expire_time){
+                //url expire
+                return r_ok('ok',['url'=>$payQrUrl,'status'=>'timed_out']);
+            }
+            else{
+                return r_ok('ok',['url'=>$payQrUrl,'status'=>'processing']);
+            }
+        }
+        else{
+            return r_ok('ok',['url'=>Request::instance()->domain().'/payment?key='.$data_key,'status'=>'not_started']);
+        }
+    }
+
+
+    /*    public function createPayment99($d=[]){
+            $d['key'] = $d['key']??'';
+            $d['cryptocurrency'] = strtoupper($d['cryptocurrency']??'');
+            if(empty($d['key'])){
+                return r_fail('The key cannot be empty!');
+            }
+            if(empty($d['cryptocurrency'])){
+                return r_fail('Cryptocurrency error!');
+            }
+            $data =  Cache::get($d['key']);
+            if(empty($data)){
+                return r_fail('The order does not exist!');
+            }
+            $order_id = $data['order_id'];
+            $payQrUrl_key = $data['source'].'_'.$d['cryptocurrency'].'_payQrUrl_'.$data['order_id'];
+            $data_url =  Cache::get($payQrUrl_key);
+            if(!is_null($data_url)){
+                return r_ok('ok',$data_url['url']);
+            }
+
+            //Check whether the appKey and appSecret is exist
+            if(empty($data['appKey'])){
+                $msg = "AirSwiftPay's appKey is not exist!";
+                $this->xielog("$order_id-----$msg",$d);
+                return r_fail('Something went wrong, please contact the merchant for handling1!');
+            }
+            if(empty($data['appSecret'])){
+                $msg = "AirSwiftPay's appSecret is not exist!";
+                $this->xielog("$order_id-----$msg",$d);
+                return r_fail('Something went wrong, please contact the merchant for handling2!');
+            }
+
+            //Create payment
+            $appKey = $data['appKey'];
+            $appSecret = $data['appSecret'];
+            $tradeType = 0;
+            $basicsType = 1;
+            $currency_unit = $d['cryptocurrency'];
+            $nonce = mt_rand(100000,999999);
+            $timestamp = floor(microtime(true) * 1000);
+            $total_amount = ceil($data['amount']*100)/100;
+            $clientOrderSn = $order_id.'_'.time();
+    //        $clientOrderSn = $order_id;
+            $hash_value = md5($appKey.$nonce.$timestamp.$currency_unit.$total_amount.$clientOrderSn.$basicsType.$tradeType.$appSecret);
+            $url = "https://order.airswift.io/docking/order/create?appKey=$appKey&sign=$hash_value&timestamp=$timestamp&nonce=$nonce";
+            $data1  = [
+                'clientOrderSn' => $clientOrderSn,
+                'tradeType' => $tradeType,
+                'coinUnit' =>$currency_unit,
+                'basicsType' => $basicsType,
+                'amount' => $total_amount,
+                'remarks' =>$appKey,
+            ];
+            $d = [
+                'do'=>'POST',
+                'url'=>$url,
+                'data'=>json_encode($data1),
+                'qt'=>[
+                    'Content-type: application/json;charset=UTF-8'
+                ]
+            ];
+            $php_result = json_decode(chttp($d),true);
+            if ($php_result['code'] !== 200) {
+                $msg = "AirSwiftPay's createPayment failed!({$php_result['message']})";
+                $this->xielog("$order_id-----$msg",$d);
+                return r_fail($php_result['message']);
+            } else {
+
+                $this->xielog("CreatePayment-----$order_id",$d);
+                $payQrUrl_key = $data['source'].'_'.$currency_unit.'_payQrUrl_'.$order_id;
+                Cache::set($payQrUrl_key,['url'=>$php_result['data'],'time'=>time()],24*60*60);
+                return r_ok('ok', $php_result['data']);
+            }
+        }*/
+
     public function createPayment($d=[]){
         $d['key'] = $d['key']??'';
         $d['cryptocurrency'] = strtoupper($d['cryptocurrency']??'');
@@ -118,54 +230,53 @@ class ServiceOrder extends Base
         if(empty($data['appKey'])){
             $msg = "AirSwiftPay's appKey is not exist!";
             $this->xielog("$order_id-----$msg",$d);
-            return r_fail('Something went wrong, please contact the merchant for handling1!');
+            return r_fail('appKey error');
         }
-        if(empty($data['appSecret'])){
-            $msg = "AirSwiftPay's appSecret is not exist!";
+        if(empty($data['merchantPrikey'])){
+            $msg = "AirSwiftPay's merchantPrikey is not exist!";
             $this->xielog("$order_id-----$msg",$d);
-            return r_fail('Something went wrong, please contact the merchant for handling2!');
+            return r_fail('merchantPrikey error');
         }
 
         //Create payment
-        $appKey = $data['appKey'];
-        $appSecret = $data['appSecret'];
-        $tradeType = 0;
-        $basicsType = 1;
-        $currency_unit = $d['cryptocurrency'];
-        $nonce = mt_rand(100000,999999);
-        $timestamp = floor(microtime(true) * 1000);
-        $total_amount = ceil($data['amount']*100)/100;
-        $clientOrderSn = $order_id.'_'.time();
 //        $clientOrderSn = $order_id;
-        $hash_value = md5($appKey.$nonce.$timestamp.$currency_unit.$total_amount.$clientOrderSn.$basicsType.$tradeType.$appSecret);
-        $url = "https://order.airswift.io/docking/order/create?appKey=$appKey&sign=$hash_value&timestamp=$timestamp&nonce=$nonce";
-        $data1  = [
-            'clientOrderSn' => $clientOrderSn,
-            'tradeType' => $tradeType,
-            'coinUnit' =>$currency_unit,
-            'basicsType' => $basicsType,
-            'amount' => $total_amount,
-            'remarks' =>$appKey,
+        $da0  = [
+            'appKey' => $data['appKey'],
+            'nonce' => mt_rand(100000,999999).'',
+            'timestamp' => floor(microtime(true) * 1000).'',
+            'clientOrderSn' => $order_id.'_'.time(),
+            'tradeType' => '0',
+            'coinUnit' =>$d['cryptocurrency'],
+            'basicsType' => '1',
+            'amount' => (ceil($data['amount']*100)/100).'',
+            'remarks' => $data['appKey'],
         ];
-        $d = [
-            'do'=>'POST',
-            'url'=>$url,
-            'data'=>json_encode($data1),
-            'qt'=>[
-                'Content-type: application/json;charset=UTF-8'
-            ]
+        ksort($da0);
+        $da0 = array_filter($da0, "removeEmptyValues");
+        $sData = implode('',$da0);
+        $sign =  encodeSHA256withRSA($sData,$data['merchantPrikey']);
+        $url = "https://temp-order.airswift.io/docking/order/create";
+        $bizContent = json_encode($da0);
+        $post_data =  [
+            'signStr'=>$sign,
+            'bizContent'=>$bizContent
         ];
-        $php_result = json_decode(chttp($d),true);
+
+        $php_result = json_decode(wPost($url,$post_data),true);
         if ($php_result['code'] !== 200) {
             $msg = "AirSwiftPay's createPayment failed!({$php_result['message']})";
             $this->xielog("$order_id-----$msg",$d);
             return r_fail($php_result['message']);
         } else {
-
+            if(strpos($php_result['data'],'http') !== false){
+                $pay_url = $php_result['data'];
+            }else{
+                $pay_url = 'https://'.$php_result['data'];
+            }
             $this->xielog("CreatePayment-----$order_id",$d);
-            $payQrUrl_key = $data['source'].'_'.$currency_unit.'_payQrUrl_'.$order_id;
-            Cache::set($payQrUrl_key,['url'=>$php_result['data'],'time'=>time()],24*60*60);
-            return r_ok('ok', $php_result['data']);
+            $payQrUrl_key = $data['source'].'_'.$da0['coinUnit'].'_payQrUrl_'.$order_id;
+            Cache::set($payQrUrl_key,['url'=>$pay_url,'time'=>time()],24*60*60);
+            return r_ok('ok', $pay_url);
         }
     }
 
@@ -288,42 +399,6 @@ class ServiceOrder extends Base
         $this->xielog("$order_id-----AirSwiftPay Payment Status:{$d["status"]}.");
         exit('failed');
     }
-
-    public function pre_pay($d=[]){
-        $order_id = $d['order_id'] ?? 0;
-        if(empty($order_id)){
-            return r_fail('Order Id cannot be empty!');
-        }
-        if($d['source'] === 'woo'){
-            $source = 'woo_';
-        }
-        elseif($d['source'] === 'shopify'){
-            $source = 'shopify_';
-        }
-        else{
-            return r_fail('Source Error!');
-        }
-        $payQrUrl_key = $source.$d['coinUnit'].'_payQrUrl_'.$order_id;
-        $data_key = md5('os_'.$payQrUrl_key);
-        $data =  Cache::get($payQrUrl_key);
-        $nowTime = time();
-        $expire_time = $this->pay_url_expire_time;
-        Cache::set($data_key,$d,24*60*60);
-        if(!is_null($data)){
-            $payQrUrl = $data['url'];
-            if($nowTime - $data['time'] >= $expire_time){
-                //url expire
-                return r_ok('ok',['url'=>$payQrUrl,'status'=>'timed_out']);
-            }
-            else{
-                return r_ok('ok',['url'=>$payQrUrl,'status'=>'processing']);
-            }
-        }
-        else{
-            return r_ok('ok',['url'=>Request::instance()->domain().'/payment?key='.$data_key,'status'=>'not_started']);
-        }
-    }
-
 
     public function currency_converted_to_usd($data){
         $total_amount = $data['total_amount'];

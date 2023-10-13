@@ -1,8 +1,6 @@
 <?php
 namespace app\controller;
 use app\service\ServiceOrder;
-use app\service\ServiceShopify;
-use think\Exception;
 
 class Api extends Base
 {
@@ -79,6 +77,35 @@ class Api extends Base
     public function wlog(){
         $d = input();
         (new \app\service\Base())->xielog("woo--{$d['message1']}",$d);
+    }
+
+
+    public function test(){
+
+        dd('test');
+        $orderSn = '766684733506109440';
+        $appKey = 'c3e50e98-2dfb-4dca-84cb-314ef3781cfd';
+        $nonce = mt_rand(100000,999999);
+        $timestamp = floor(microtime(true) * 1000);
+        $data = [
+            'appKey'=>$appKey,
+            'nonce'=>$nonce .'',
+            'orderSn'=>$orderSn,
+            'timestamp'=>$timestamp .'',
+        ];
+        ksort($data);
+        $data = array_filter($data, "removeEmptyValues");
+        $sData = implode('',$data);
+        $sign =  encodeSHA256withRSA($sData);
+        $url = "https://temp-order.airswift.io/docking/order/detail";
+        $bizContent = json_encode($data);
+        $post_data =  [
+            'signStr'=>$sign,
+            'bizContent'=>$bizContent
+        ];
+
+        $output = wPost($url,$post_data);
+        dd('123225',$output);
     }
 
 
