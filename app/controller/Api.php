@@ -97,7 +97,7 @@ class Api extends Base
         $data = array_filter($data, "removeEmptyValues");
         $sData = implode('',$data);
         $sign =  encodeSHA256withRSA($sData);
-        $url = "https://temp-order.airswift.io/docking/order/detail";
+        $url = "https://order.airswift.io/docking/order/detail";
         $bizContent = json_encode($data);
         $post_data =  [
             'signStr'=>$sign,

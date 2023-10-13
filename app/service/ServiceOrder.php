@@ -255,13 +255,12 @@ class ServiceOrder extends Base
         $da0 = array_filter($da0, "removeEmptyValues");
         $sData = implode('',$da0);
         $sign =  encodeSHA256withRSA($sData,$data['merchantPrikey']);
-        $url = "https://temp-order.airswift.io/docking/order/create";
+        $url = "https://order.airswift.io/docking/order/create";
         $bizContent = json_encode($da0);
         $post_data =  [
             'signStr'=>$sign,
             'bizContent'=>$bizContent
         ];
-
         $php_result = json_decode(wPost($url,$post_data),true);
         if ($php_result['code'] !== 200) {
             $msg = "AirSwiftPay's createPayment failed!({$php_result['message']})";
