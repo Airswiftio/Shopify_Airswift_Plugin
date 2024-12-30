@@ -40,7 +40,6 @@
             "": "extend/"
         },
         "files": [
-            "vendor/topthink/framework/src/helper.php",
             "app/common.php"
         ]
     },

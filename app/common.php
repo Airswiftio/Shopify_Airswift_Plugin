@@ -1,6 +1,20 @@
 <?php
 // 应用公共文件
 
+if (!function_exists('env')) {
+    /**
+     * 获取环境变量值
+     * @access public
+     * @param string $name 环境变量名
+     * @param mixed $default 默认值
+     * @return mixed
+     */
+    function env($name, $default = null)
+    {
+        return \think\facade\Env::get($name, $default);
+    }
+}
+
 /**
  * curl 操作函数
  * $d 参数列表
