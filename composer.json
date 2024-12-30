@@ -33,15 +33,16 @@
         "topthink/think-trace":"^1.0"
     },
     "autoload": {
-        "files": [
-            "app/common.php"
-        ],
         "psr-4": {
             "app\\": "app"
         },
         "psr-0": {
             "": "extend/"
-        }
+        },
+        "files": [
+            "vendor/topthink/framework/src/helper.php",
+            "app/common.php"
+        ]
     },
     "config": {
         "preferred-install": "dist"
