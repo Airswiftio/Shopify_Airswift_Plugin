@@ -1,6 +1,7 @@
 /.idea
 /.vscode
-.env
+/.env
+/.user.ini
 *.log
 /vendor
 /runtime
