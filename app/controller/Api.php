@@ -1,7 +1,6 @@
 <?php
 namespace app\controller;
 use app\service\ServiceOrder;
-use think\facade\Env;
 
 class Api extends Base
 {
@@ -82,34 +81,8 @@ class Api extends Base
 
 
     public function test(){
-        try{
-            // 打印整个环境变量数组
-            var_dump(Env::get());
-            var_dump('-----1221');
-            var_dump(env('DATABASE_TYPE','aa'));
 
-
-
-            // 分别用不同方式获取，看看结果
-            var_dump([
-                'method1' => env('database.type'),
-                'method2' => Env::get('database.type'),
-                'method3' => \think\facade\Env::get('database.type'),
-                // 尝试不同的键名格式
-                'method4' => env('DATABASE_TYPE'),
-                'method5' => env('database.TYPE'),
-            ]);
-
-            // 检查 helper.php 是否被加载
-            var_dump(function_exists('env'));
-        }
-        catch (\Exception $e){
-            echo $e->getMessage();
-
-        }
-
-
-        exit;
+        dd('test');
         $orderSn = '766684733506109440';
         $appKey = 'c3e50e98-2dfb-4dca-84cb-314ef3781cfd';
         $nonce = mt_rand(100000,999999);
