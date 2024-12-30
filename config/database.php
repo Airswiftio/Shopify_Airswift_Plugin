@@ -54,6 +54,8 @@ return [
             'break_reconnect' => false,
             // 监听SQL
             'trigger_sql'     => env('app_debug', true),
+            // 开启开发者模式，显示详细的SQL执行日志
+            'debug'          => env('app_debug', true),
             // 开启字段缓存
             'fields_cache'    => false,
         ],
