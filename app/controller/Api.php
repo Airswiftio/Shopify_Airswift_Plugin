@@ -51,22 +51,22 @@ class Api extends Base
         $d = input();
         return (new ServiceOrder())->createPayment($d);
     }
-
-    public function callback(){
-        $d = input();
-        return (new ServiceOrder())->callBack($d);
-    }
+//
+//    public function callback(){
+//        $d = input();
+//        return (new ServiceOrder())->callBack($d);
+//    }
 
     public function woo_pre_pay(){
         $d = input();
         $d['source'] ='woo';
         return (new ServiceOrder())->pre_pay($d);
     }
-
-    public function pre_shopify(){
-        $d = input();
-        return (new ServiceOrder())->preShopify($d);
-    }
+//
+//    public function pre_shopify(){
+//        $d = input();
+//        return (new ServiceOrder())->preShopify($d);
+//    }
 
     public function currency_to_usd(){
         $d = input();
@@ -78,35 +78,35 @@ class Api extends Base
         $d = input();
         (new \app\service\Base())->xielog("woo--{$d['message1']}",$d);
     }
-
-
-    public function test(){
-
-        dd('test');
-        $orderSn = '766684733506109440';
-        $appKey = 'c3e50e98-2dfb-4dca-84cb-314ef3781cfd';
-        $nonce = mt_rand(100000,999999);
-        $timestamp = floor(microtime(true) * 1000);
-        $data = [
-            'appKey'=>$appKey,
-            'nonce'=>$nonce .'',
-            'orderSn'=>$orderSn,
-            'timestamp'=>$timestamp .'',
-        ];
-        ksort($data);
-        $data = array_filter($data, "removeEmptyValues");
-        $sData = implode('',$data);
-        $sign =  encodeSHA256withRSA($sData);
-        $url = "https://order.airswift.io/docking/order/detail";
-        $bizContent = json_encode($data);
-        $post_data =  [
-            'signStr'=>$sign,
-            'bizContent'=>$bizContent
-        ];
-
-        $output = wPost($url,$post_data);
-        dd('123225',$output);
-    }
+//
+//
+//    public function test(){
+//
+//        dd('test');
+//        $orderSn = '766684733506109440';
+//        $appKey = 'c3e50e98-2dfb-4dca-84cb-314ef3781cfd';
+//        $nonce = mt_rand(100000,999999);
+//        $timestamp = floor(microtime(true) * 1000);
+//        $data = [
+//            'appKey'=>$appKey,
+//            'nonce'=>$nonce .'',
+//            'orderSn'=>$orderSn,
+//            'timestamp'=>$timestamp .'',
+//        ];
+//        ksort($data);
+//        $data = array_filter($data, "removeEmptyValues");
+//        $sData = implode('',$data);
+//        $sign =  encodeSHA256withRSA($sData);
+//        $url = env('APP.pelago_api_url','https://pg-as-staging.walkcloud.xyz')."/merchant-api/crypto-order/{orderId}";
+//        $bizContent = json_encode($data);
+//        $post_data =  [
+//            'signStr'=>$sign,
+//            'bizContent'=>$bizContent
+//        ];
+//
+//        $output = wPost($url,$post_data);
+//        dd('123225',$output);
+//    }
 
 
 }

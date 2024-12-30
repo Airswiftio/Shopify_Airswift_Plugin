@@ -1,11 +1,3 @@
-
-<!--
- * @FileDescription:
- * @Author: ruokun Yin
- * @Date: 2022-07-06 13:46:10
- * @LastEditors: jianguo Wang
- * @LastEditTime: 2022-11-10 17:23:08
--->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,7 +5,7 @@
     <?php $version = time();?>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title i18n="title">Checkouts</title>
     <link rel="stylesheet" href="/static/payment/css/reset.css?v=<?php echo $version;?>">
     <link rel="stylesheet" href="/static/payment/css/common.css?v=<?php echo $version;?>">
@@ -21,6 +13,160 @@
 
     <noscript><link rel="stylesheet" type="text/css" href="/static/drop_down/css/noJS.css?v=<?php echo $version;?>" /></noscript>
     <script type="text/javascript" src="/static/drop_down/js/modernizr.custom.79639.js?v=<?php echo $version;?>"></script>
+
+    <style>
+
+
+    .body {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .pc-centainer {
+        width: 100%;
+        border-radius: 10px;
+        overflow: hidden;
+        background-color: #fbfbfb;
+    }
+    .pc_status_04 {
+        width: 48px ;
+        height: 48px ;
+        margin: 15px 8px ;
+        display: block;
+    }
+
+    .pcHeader img {
+        margin-top: 5px;
+        width: 137px;
+    }
+    /* Add mobile styles */
+    @media screen and (max-width: 822px) {
+
+
+        .main {
+            padding: 0 15px;
+            width: 100%;
+            box-sizing: border-box;
+
+        }
+        .headBar {
+            height: 13vh;
+            padding-bottom: 3vh;
+        }
+
+        /*.pcHeader {*/
+        /*    padding: 15px;*/
+        /*    display: flex;*/
+        /*    align-items: center;*/
+        /*    flex-wrap: wrap;*/
+        /*}*/
+        .pcHeader {
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+        }
+
+
+        .pcHeader span {
+            display: inline-block;
+            margin-top: 5px;
+            margin-left: 10px;
+            font-family: PingFangSC-Semibold;
+            font-size: 21px;
+            color: rgba(44, 48, 64, 0.4);
+            letter-spacing: 0;
+            line-height: 36px;
+            font-weight: 600;
+        }
+
+        .body_header {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            border-radius: 10px 10px 0 0 ;
+            overflow: hidden;
+            justify-content: center;
+            padding: 15px;
+            background: #ffffff;
+            height: 96px;
+            border-bottom: 5px solid rgba(170, 170, 170, 0.2);
+
+        }
+
+        .body_header img {
+            width: 48px;
+            height: 48px;
+        }
+
+        .body_header .pc_status_00 {
+            margin: 5px 0;
+        }
+
+        .pc_status_022 {
+            padding: 15px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .wrapper-demo {
+            width: 100%;
+        }
+
+        #dd.wrapper-dropdown-3 {
+            width: 100% !important;
+            max-width: 350px;
+            margin: 0 auto;
+        }
+
+        .wrapper-dropdown-3 .dropdown {
+            width: 100%;
+            max-width: 350px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .as_submit {
+            width: 100%;
+            max-width: 350px;
+            margin: 20px auto;
+            box-sizing: border-box;
+            background: linear-gradient(98.48deg, #8DFE59 -3.85%, #3ACBF6 35.75%, #6055FF 69.61%);
+            box-shadow: inset 0px 2px 0px rgba(255, 255, 255, 0.2), inset 0px -2px 0px rgba(59, 53, 146, 0.5);
+            color: #FFFFFF;
+            border-radius: 25px;
+            cursor: pointer;
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+        .pcTipFont{
+            width: 100%;
+        }
+        .pc-centainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            border-radius:0 0 10px 10px;
+            overflow: hidden;
+        }
+
+        .icon_title0{
+            margin-right: 12px;
+        }
+
+        .body {
+            padding-top: 0;
+        }
+
+
+        .pc_status_00 {
+             width: 75vw;
+        }
+    }
+
+    </style>
 
 </head>
 <body>
@@ -40,12 +186,12 @@
     <div class="body">
 
         <div class="body_header">
-            <img class="pc_status_04" style="width: 48px;height:48px;margin: 24px;;" src="/static/payment/img/order-loading.png?v=<?php echo $version;?>" alt="">
+            <img class="pc_status_04" src="/static/payment/img/order-loading.png?v=<?php echo $version;?>" alt="">
 
             <div >
                 <p class="pc_status_00">
                     <span class="pcTipFont0">Order Sn: </span>
-                    <span class="pcTipFont1"><b class="orderSn">{$clientOrderSn}</b></span>
+                    <span class="pcTipFont1"><b class="orderSn">{$order_id}</b></span>
                 </p>
                 <!--                <p class="pc_status_00" style="margin-top: 10px;">-->
                 <!--                    <span class="pcTipFont0">订单来源：</span>-->
@@ -73,12 +219,13 @@
                         <div class="line_03 Num">
                             <div class="wrapper-demo">
                                 <div id="dd" class="wrapper-dropdown-3" tabindex="1" style="width: 350px">
-                                    <div class="iconsss0"><img class="icon_currency0" src="/static/payment/icon/icon_USDT.png?v=<?php echo $version;?>" alt="USDT"> <span class="icon_title0">USDT</span></div>
+                                    <div class="iconsss0"><img class="icon_currency0" src="/static/payment/icon/icon_USDT.png?v=<?php echo $version;?>" alt="USDT-ERC20"> <span class="icon_title0">USDT-ERC20</span></div>
 
                                     <ul class="dropdown">
-                                        <li><a href="#"><img class="icon_currency" src="/static/payment/icon/icon_USDT.png?v=<?php echo $version;?>" alt="USDT"><div class="icon_title">USDT</div></a></li>
-                                        <li><a href="#"><img class="icon_currency" src="/static/payment/icon/icon_USDC.png?v=<?php echo $version;?>" alt="USDC"><div class="icon_title">USDC</div></a></li>
-                                        <li><a href="#"><img class="icon_currency" src="/static/payment/icon/icon_ETH.png?v=<?php echo $version;?>" alt="ETH"><div class="icon_title">ETH</div></a></li>
+                                        <li><a href="#"><img class="icon_currency" src="/static/payment/icon/icon_USDT.png?v=<?php echo $version;?>" alt="USDT-ERC20"><div class="icon_title">USDT-ERC20</div></a></li>
+                                        <li><a href="#"><img class="icon_currency" src="/static/payment/icon/icon_USDC.png?v=<?php echo $version;?>" alt="USDT-TRC20"><div class="icon_title">USDT-TRC20</div></a></li>
+                                        <li><a href="#"><img class="icon_currency" src="/static/payment/icon/icon_USDC.png?v=<?php echo $version;?>" alt="USDC-ERC20"><div class="icon_title">USDC-ERC20</div></a></li>
+<!--                                        <li><a href="#"><img class="icon_currency" src="/static/payment/icon/icon_ETH.png?v=<?php echo $version;?>" alt="ETH"><div class="icon_title">ETH</div></a></li>-->
 <!--                                        <li><a href="#">CNT</a></li>-->
                                     </ul>
                                 </div>
@@ -177,7 +324,7 @@
             return false;
         }
         if(form_data.cryptocurrency?.length <= 0){
-            form_data.cryptocurrency = "USDT";
+            form_data.cryptocurrency = "USDT-ERC20";
         }
         let res = await fetch('/api-create_payment',{
             method:'post',
