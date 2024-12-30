@@ -319,13 +319,23 @@ function encodeSHA256withRSA($content,$privateKey0=''){
 }
 
 
-function wPost($url = '',$post_data = []){
+function wPost($url = '',$post_data = [],$headers=[]){
     $ch = curl_init();//初始化cURL
 
     curl_setopt($ch,CURLOPT_URL,$url);//抓取指定网页
     curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);//要求结果为字符串并输出到屏幕上
     curl_setopt($ch,CURLOPT_POST,1);//Post请求方式
 //        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+
+    //附加头信息
+    if (!empty($headers)) {
+        foreach ($headers as $v)
+        {
+            $header[] = $v;
+        }
+    }
+
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
     curl_setopt($ch,CURLOPT_POSTFIELDS,$post_data);//Post变量
 
     $output = curl_exec($ch);//执行并获得HTML内容

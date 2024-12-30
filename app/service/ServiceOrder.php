@@ -270,7 +270,10 @@ class ServiceOrder extends Base
             'signature'=>$sign,
             'data'=>$bizContent
         ];
-        $php_result = json_decode(wPost($url,$post_data),true);
+        $headers = [
+            "Merchant-APP-Key:{$data['merchantPrikey']}",
+        ];
+        $php_result = json_decode(wPost($url,$post_data,$headers),true);
         if ($php_result['code'] !== 200) {
             $msg = "AirSwiftPay's createPayment failed!({$php_result['message']})";
             $this->xielog("$order_id-----$msg",$d);

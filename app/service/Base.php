@@ -11,6 +11,5 @@ class Base
             $nr = json_encode($nr);
         }
         Db::table('asp_log')->save(['nr'=>$nr,'msg'=>$msg]);
-
     }
 }

@@ -55,6 +55,7 @@ class Api extends Base
         }
         catch (\Exception $e) {
             Log::error($e->getMessage());
+            return r_fail($e->getMessage());
         }
 
     }
