@@ -276,6 +276,9 @@ class ServiceOrder extends Base
             "Merchant-APP-Key:{$data['appKey']}",
         ];
         $php_result = json_decode(wPost($url,json_encode($post_data),$headers),true);
+
+        $php_result11 = json_decode(wGet(env('APP.pelago_api_host','')."/merchant-api/crypto-order/{$php_result['data']['order']['orderId']}"),true);
+        dd('dd',$php_result11);
         if ($php_result['code'] !== 0) {
             $msg = "AirSwiftPay's createPayment failed!({$php_result['msg']})";
             $this->xielog("$order_id-----$msg",$d);

@@ -343,3 +343,24 @@ function wPost($url = '',$post_data = [],$headers=[]){
     return $output;
 }
 
+function wGet($url = '', $params = []) {
+    // 如果有参数，将其添加到URL中
+    if (!empty($params)) {
+        $url .= (strpos($url, '?') === false ? '?' : '&') . http_build_query($params);
+    }
+
+    $ch = curl_init(); // 初始化cURL
+
+    curl_setopt($ch, CURLOPT_URL, $url); // 抓取指定网页
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // 要求结果为字符串并输出到屏幕上
+    curl_setopt($ch, CURLOPT_HTTPGET, true); // GET请求方式
+//  curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+
+    $output = curl_exec($ch); // 执行并获得HTML内容
+    curl_close($ch); // 释放cURL句柄
+    return $output;
+    // 使用示例：
+// $result = wGet('https://api.example.com', ['id' => 123, 'name' => 'test']);
+// 这会请求 https://api.example.com?id=123&name=test
+}
+
