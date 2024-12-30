@@ -1,6 +1,7 @@
 <?php
 namespace app\controller;
 use app\service\ServiceOrder;
+use think\facade\Env;
 
 class Api extends Base
 {
@@ -78,35 +79,61 @@ class Api extends Base
         $d = input();
         (new \app\service\Base())->xielog("woo--{$d['message1']}",$d);
     }
-//
-//
-//    public function test(){
-//
-//        dd('test');
-//        $orderSn = '766684733506109440';
-//        $appKey = 'c3e50e98-2dfb-4dca-84cb-314ef3781cfd';
-//        $nonce = mt_rand(100000,999999);
-//        $timestamp = floor(microtime(true) * 1000);
-//        $data = [
-//            'appKey'=>$appKey,
-//            'nonce'=>$nonce .'',
-//            'orderSn'=>$orderSn,
-//            'timestamp'=>$timestamp .'',
-//        ];
-//        ksort($data);
-//        $data = array_filter($data, "removeEmptyValues");
-//        $sData = implode('',$data);
-//        $sign =  encodeSHA256withRSA($sData);
-//        $url = env('APP.pelago_api_url','https://pg-as-staging.walkcloud.xyz')."/merchant-api/crypto-order/{orderId}";
-//        $bizContent = json_encode($data);
-//        $post_data =  [
-//            'signStr'=>$sign,
-//            'bizContent'=>$bizContent
-//        ];
-//
-//        $output = wPost($url,$post_data);
-//        dd('123225',$output);
-//    }
+
+
+    public function test(){
+        try{
+            // 打印整个环境变量数组
+            var_dump(Env::get());
+            var_dump('-----1221');
+            var_dump(env('DATABASE_TYPE','aa'));
+
+
+
+            // 分别用不同方式获取，看看结果
+            var_dump([
+                'method1' => env('database.type'),
+                'method2' => Env::get('database.type'),
+                'method3' => \think\facade\Env::get('database.type'),
+                // 尝试不同的键名格式
+                'method4' => env('DATABASE_TYPE'),
+                'method5' => env('database.TYPE'),
+            ]);
+
+            // 检查 helper.php 是否被加载
+            var_dump(function_exists('env'));
+        }
+        catch (\Exception $e){
+            echo $e->getMessage();
+
+        }
+
+
+        exit;
+        $orderSn = '766684733506109440';
+        $appKey = 'c3e50e98-2dfb-4dca-84cb-314ef3781cfd';
+        $nonce = mt_rand(100000,999999);
+        $timestamp = floor(microtime(true) * 1000);
+        $data = [
+            'appKey'=>$appKey,
+            'nonce'=>$nonce .'',
+            'orderSn'=>$orderSn,
+            'timestamp'=>$timestamp .'',
+        ];
+        ksort($data);
+        $data = array_filter($data, "removeEmptyValues");
+        $sData = implode('',$data);
+        $sign =  encodeSHA256withRSA($sData);
+        $url = env('APP.pelago_api_url','https://pg-as-staging.walkcloud.xyz')."/merchant-api/crypto-order/{orderId}";
+        $bizContent = json_encode($data);
+        $post_data =  [
+            'signStr'=>$sign,
+            'bizContent'=>$bizContent
+        ];
+
+        $output = wPost($url,$post_data);
+        dd('123225',$output);
+    }
 
 
 }

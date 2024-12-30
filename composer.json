@@ -38,10 +38,7 @@
         },
         "psr-0": {
             "": "extend/"
-        },
-        "files": [
-            "app/common.php"
-        ]
+        }
     },
     "config": {
         "preferred-install": "dist"
