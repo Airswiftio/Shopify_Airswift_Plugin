@@ -1,6 +1,7 @@
 <?php
 namespace app\controller;
 use app\service\ServiceOrder;
+use think\facade\Log;
 
 class Api extends Base
 {
@@ -48,8 +49,14 @@ class Api extends Base
     }
 
     public function create_order(){
-        $d = input();
-        return (new ServiceOrder())->createPayment($d);
+        try {
+            $d = input();
+            return (new ServiceOrder())->createPayment($d);
+        }
+        catch (\Exception $e) {
+            Log::error($e->getMessage());
+        }
+
     }
 //
 //    public function callback(){

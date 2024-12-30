@@ -232,11 +232,11 @@ class ServiceOrder extends Base
             $this->xielog("$order_id-----$msg",$d);
             return r_fail('merchantId error');
         }
-        if(empty($data['appKey'])){
-            $msg = "AirSwiftPay's appKey is not exist!";
-            $this->xielog("$order_id-----$msg",$d);
-            return r_fail('appKey error');
-        }
+//        if(empty($data['appKey'])){
+//            $msg = "AirSwiftPay's appKey is not exist!";
+//            $this->xielog("$order_id-----$msg",$d);
+//            return r_fail('appKey error');
+//        }
         if(empty($data['merchantPrikey'])){
             $msg = "AirSwiftPay's merchantPrikey is not exist!";
             $this->xielog("$order_id-----$msg",$d);
