@@ -33,6 +33,9 @@
         "topthink/think-trace":"^1.0"
     },
     "autoload": {
+        "files": [
+            "vendor/topthink/framework/src/helper.php"
+        ],
         "psr-4": {
             "app\\": "app"
         },
