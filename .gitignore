@@ -4,7 +4,6 @@
 /.user.ini
 /public/.user.ini
 *.log
-/vendor
 /runtime
 /public/merchant
 /view-admin/node_modules
