@@ -232,11 +232,11 @@ class ServiceOrder extends Base
             $this->xielog("$order_id-----$msg",$d);
             return r_fail('merchantId error');
         }
-//        if(empty($data['appKey'])){
-//            $msg = "AirSwiftPay's appKey is not exist!";
-//            $this->xielog("$order_id-----$msg",$d);
-//            return r_fail('appKey error');
-//        }
+        if(empty($data['appKey'])){
+            $msg = "AirSwiftPay's appKey is not exist!";
+            $this->xielog("$order_id-----$msg",$d);
+            return r_fail('appKey error');
+        }
         if(empty($data['merchantPrikey'])){
             $msg = "AirSwiftPay's merchantPrikey is not exist!";
             $this->xielog("$order_id-----$msg",$d);
@@ -252,6 +252,7 @@ class ServiceOrder extends Base
 //        $merchantOrderId = $order_id;
         $da0  = [
             'merchantId' => $data['merchantId'],
+//            'merchantOrderId' => $order_id,
             'merchantOrderId' => $order_id.'_'.time(),
             'coinId' =>$d['cryptocurrency'],
             'amount' => (ceil($data['amount']*100)/100).'',
@@ -268,22 +269,23 @@ class ServiceOrder extends Base
         $bizContent = json_encode($da0);
         $post_data =  [
             'signature'=>$sign,
-            'data'=>$bizContent
+            'data'=>$da0
         ];
         $headers = [
-            "Merchant-APP-Key:{$data['merchantPrikey']}",
+            "Content-Type: application/json",
+            "Merchant-APP-Key:{$data['appKey']}",
         ];
-        $php_result = json_decode(wPost($url,$post_data,$headers),true);
-        if ($php_result['code'] !== 200) {
-            $msg = "AirSwiftPay's createPayment failed!({$php_result['message']})";
+        $php_result = json_decode(wPost($url,json_encode($post_data),$headers),true);
+        if ($php_result['code'] !== 0) {
+            $msg = "AirSwiftPay's createPayment failed!({$php_result['msg']})";
             $this->xielog("$order_id-----$msg",$d);
-            return r_fail($php_result['message']);
+            return r_fail($php_result['msg']);
         } else {
-            if(strpos($php_result['data'],'http') !== false){
-                $pay_url = $php_result['data'];
-            }else{
-                $pay_url = 'https://'.$php_result['data'];
-            }
+//            if(strpos($php_result['data'],'http') !== false){
+//            }else{
+//                $pay_url = 'https://'.$php_result['data'];
+//            }
+            $pay_url = $php_result['data']['cashierUrl'];
             $this->xielog("CreatePayment-----$order_id",$d);
             $payQrUrl_key = $data['source'].'_'.$da0['coinId'].'_payQrUrl_'.$order_id;
             Cache::set($payQrUrl_key,['url'=>$pay_url,'time'=>time()],24*60*60);
@@ -413,7 +415,7 @@ class ServiceOrder extends Base
 
     public function currency_converted_to_usd($data){
         $total_amount = $data['total_amount'];
-         $order_id = $data['order_id']?? 0;
+        $order_id = $data['order_id']?? 0;
         $currencyCode = strtolower($data['currencyCode']);
         //Currency exchange rate conversion, all currencies are converted to USD
         if( $currencyCode !== 'usd'){
@@ -424,6 +426,6 @@ class ServiceOrder extends Base
             }
             $total_amount = $res;
         }
-       return r_ok('ok',$total_amount);
+        return r_ok('ok',$total_amount);
     }
 }
