@@ -34,7 +34,7 @@
     },
     "autoload": {
         "files": [
-            "vendor/topthink/framework/src/helper.php"
+            "app/common.php"
         ],
         "psr-4": {
             "app\\": "app"
