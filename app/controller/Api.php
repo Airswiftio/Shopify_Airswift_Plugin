@@ -66,9 +66,15 @@ class Api extends Base
 //    }
 
     public function woo_pre_pay(){
-        $d = input();
-        $d['source'] ='woo';
-        return (new ServiceOrder())->pre_pay($d);
+        try {
+            $d = input();
+            $d['source'] ='woo';
+            return (new ServiceOrder())->pre_pay($d);
+        }
+        catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return r_fail($e->getMessage());
+        }
     }
 //
 //    public function pre_shopify(){
@@ -77,14 +83,26 @@ class Api extends Base
 //    }
 
     public function currency_to_usd(){
-        $d = input();
-        return (new ServiceOrder())->currency_converted_to_usd($d);
+        try {
+            $d = input();
+            return (new ServiceOrder())->currency_converted_to_usd($d);
+        }
+        catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return r_fail($e->getMessage());
+        }
+
     }
 
 
     public function wlog(){
-        $d = input();
-        (new \app\service\Base())->xielog("woo--{$d['message1']}",$d);
+        try {
+            $d = input();
+            (new \app\service\Base())->xielog("woo--{$d['message1']}",$d);
+        }
+        catch (\Exception $e) {
+            Log::error($e->getMessage());
+        }
     }
 
 

@@ -115,18 +115,17 @@ class ServiceOrder extends Base
         $nowTime = time();
         $expire_time = $this->pay_url_expire_time;
         Cache::set($data_key,$d,24*60*60);
-        if(!is_null($data)){
-            $payQrUrl = $data['url'];
-            if($nowTime - $data['time'] >= $expire_time){
-                //url expire
-                return r_ok('ok',['url'=>$payQrUrl,'status'=>'timed_out']);
-            }
-            else{
-                return r_ok('ok',['url'=>$payQrUrl,'status'=>'processing']);
-            }
+        if(is_null($data)){
+            return r_ok('ok',['url'=>Request::instance()->domain().'/payment?key='.$data_key,'status'=>'not_started']);
+        }
+
+        $payQrUrl = $data['url'];
+        if($nowTime - $data['time'] >= $expire_time){
+            //url expire
+            return r_ok('ok',['url'=>$payQrUrl,'status'=>'timed_out']);
         }
         else{
-            return r_ok('ok',['url'=>Request::instance()->domain().'/payment?key='.$data_key,'status'=>'not_started']);
+            return r_ok('ok',['url'=>$payQrUrl,'status'=>'processing']);
         }
     }
 
@@ -252,7 +251,6 @@ class ServiceOrder extends Base
 //        $merchantOrderId = $order_id;
         $da0  = [
             'merchantId' => $data['merchantId'],
-//            'merchantOrderId' => $order_id,
             'merchantOrderId' => $order_id.'_'.time(),
             'coinId' =>$d['cryptocurrency'],
             'amount' => (ceil($data['amount']*100)/100).'',
@@ -266,7 +264,6 @@ class ServiceOrder extends Base
         $sData = implode('',$da0);
         $sign =  encodeSHA256withRSA($sData,$data['merchantPrikey']);
         $url = env('APP.pelago_api_host','')."/merchant-api/crypto-order";
-        $bizContent = json_encode($da0);
         $post_data =  [
             'signature'=>$sign,
             'data'=>$da0
@@ -280,17 +277,13 @@ class ServiceOrder extends Base
             $msg = "AirSwiftPay's createPayment failed!({$php_result['msg']})";
             $this->xielog("$order_id-----$msg",$d);
             return r_fail($php_result['msg']);
-        } else {
-//            if(strpos($php_result['data'],'http') !== false){
-//            }else{
-//                $pay_url = 'https://'.$php_result['data'];
-//            }
-            $pay_url = $php_result['data']['cashierUrl'];
-            $this->xielog("CreatePayment-----$order_id",$d);
-            $payQrUrl_key = $data['source'].'_'.$da0['coinId'].'_payQrUrl_'.$order_id;
-            Cache::set($payQrUrl_key,['url'=>$pay_url,'time'=>time()],24*60*60);
-            return r_ok('ok', $pay_url);
         }
+
+        $pay_url = $php_result['data']['cashierUrl'];
+        $this->xielog("CreatePayment-----$order_id",$d);
+        $payQrUrl_key = $data['source'].'_'.$da0['coinId'].'_payQrUrl_'.$order_id;
+        Cache::set($payQrUrl_key,['url'=>$pay_url,'time'=>time()],24*60*60);
+        return r_ok('ok', $pay_url);
     }
 //
 //    public function callBack($d = []){
