@@ -319,27 +319,43 @@ function encodeSHA256withRSA($content,$privateKey0=''){
 }
 
 
-function wPost($url = '',$post_data = [],$headers=[]){
-    $ch = curl_init();//初始化cURL
+function wPost($url = '', $post_data = [], $headers = []) {
+    $ch = curl_init();
 
-    curl_setopt($ch,CURLOPT_URL,$url);//抓取指定网页
-    curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);//要求结果为字符串并输出到屏幕上
-    curl_setopt($ch,CURLOPT_POST,1);//Post请求方式
-//        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+    // Basic cURL options
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POST, 1);
 
-    //附加头信息
-    if (!empty($headers)) {
-        foreach ($headers as $v)
-        {
-            $header[] = $v;
-        }
+    // Set default headers
+    $default_headers = [
+        'Content-Type: application/json',
+        'Accept: */*',
+        'Connection: keep-alive'
+    ];
+
+    // Merge custom headers with default headers
+    $header = array_merge($default_headers, $headers);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+
+    // Handle post data - convert array to JSON if needed
+    if (is_array($post_data)) {
+        $post_data = json_encode($post_data);
+    }
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+
+    // Additional options for better handling
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
+    $output = curl_exec($ch);
+
+    // Error handling
+    if (curl_errno($ch)) {
+        $output = curl_error($ch);
     }
 
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-    curl_setopt($ch,CURLOPT_POSTFIELDS,$post_data);//Post变量
-
-    $output = curl_exec($ch);//执行并获得HTML内容
-    curl_close($ch);//释放cURL句柄
+    curl_close($ch);
     return $output;
 }
 
@@ -363,4 +379,3 @@ function wGet($url = '', $params = []) {
 // $result = wGet('https://api.example.com', ['id' => 123, 'name' => 'test']);
 // 这会请求 https://api.example.com?id=123&name=test
 }
-
