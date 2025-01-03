@@ -329,7 +329,6 @@ function wPost($url = '', $post_data = [], $headers = []) {
 
     // Set default headers
     $default_headers = [
-        'Content-Type: application/json',
         'Accept: */*',
         'Connection: keep-alive'
     ];
@@ -359,21 +358,41 @@ function wPost($url = '', $post_data = [], $headers = []) {
     return $output;
 }
 
-function wGet($url = '', $params = []) {
-    // 如果有参数，将其添加到URL中
+function wGet($url = '', $params = [], $headers = []) {
+    // Add parameters to URL if present
     if (!empty($params)) {
         $url .= (strpos($url, '?') === false ? '?' : '&') . http_build_query($params);
     }
 
-    $ch = curl_init(); // 初始化cURL
+    $ch = curl_init();
 
-    curl_setopt($ch, CURLOPT_URL, $url); // 抓取指定网页
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // 要求结果为字符串并输出到屏幕上
-    curl_setopt($ch, CURLOPT_HTTPGET, true); // GET请求方式
-//  curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+    // Basic cURL options
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_HTTPGET, true);
 
-    $output = curl_exec($ch); // 执行并获得HTML内容
-    curl_close($ch); // 释放cURL句柄
+    // Set default headers
+    $default_headers = [
+        'Accept: */*',
+        'Connection: keep-alive'
+    ];
+
+    // Merge custom headers with default headers
+    $header = array_merge($default_headers, $headers);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+
+    // Additional options for better handling
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
+    $output = curl_exec($ch);
+
+    // Error handling
+    if (curl_errno($ch)) {
+        $output = curl_error($ch);
+    }
+
+    curl_close($ch);
     return $output;
     // 使用示例：
 // $result = wGet('https://api.example.com', ['id' => 123, 'name' => 'test']);
