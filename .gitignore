@@ -8,3 +8,4 @@
 /runtime
 /public/merchant
 /view-admin/node_modules
+.well-known
