@@ -247,31 +247,36 @@ class ServiceOrder extends Base
             return r_fail('notifyUrl error');
         }
 
-        //Create payment
-//        $merchantOrderId = $order_id;
+        //Create payment according to latest API documentation
         $da0  = [
             'merchantId' => $data['merchantId'],
             'merchantOrderId' => $order_id.'_'.time(),
-            'coinId' =>$d['cryptocurrency'],
-            'amount' => (ceil($data['amount']*100)/100).'',
-            'timestamp' => floor(microtime(true) * 1000).'',
-            'nonce' => mt_rand(100000,999999).'',
+            'amount' => (float)(ceil($data['amount']*100)/100),
+            'coinId' => $d['cryptocurrency'],
+            'timestamp' => (string)floor(microtime(true) * 1000),
+            'nonce' => (string)mt_rand(100000,999999),
             'notifyUrl' => $data['notifyUrl'],
             'redirectUrl' => $data['redirectUrl'],
         ];
-        ksort($da0);
+        
+        // Remove empty values and sort for signature
         $da0 = array_filter($da0, "removeEmptyValues");
+        ksort($da0);
         $sData = implode('',$da0);
-        $sign =  encodeSHA256withRSA($sData,$data['merchantPrikey']);
+        $sign = encodeSHA256withRSA($sData,$data['merchantPrikey']);
+        
         $url = env('APP.pelago_api_host','')."/merchant-api/crypto-order";
-        $post_data =  [
-            'signature'=>$sign,
-            'data'=>$da0
+        $post_data = [
+            'data' => $da0,
+            'signature' => $sign
         ];
+        
+        // Updated header according to new API documentation
         $headers = [
             "Content-Type: application/json",
-            "Merchant-APP-Key:{$data['appKey']}",
+            "X-App-Key: {$data['appKey']}",
         ];
+        
         $php_result = json_decode(wPost($url,json_encode($post_data),$headers),true);
         if ($php_result['code'] !== 0) {
             $msg = "AirSwiftPay's createPayment failed!({$php_result['msg']})";
