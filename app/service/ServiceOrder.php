@@ -274,7 +274,7 @@ class ServiceOrder extends Base
         // Updated header according to new API documentation
         $headers = [
             "Content-Type: application/json",
-            "X-App-Key: {$data['appKey']}",
+            "Merchant-APP-Key: {$data['appKey']}",
         ];
         
         $php_result = json_decode(wPost($url,json_encode($post_data),$headers),true);
