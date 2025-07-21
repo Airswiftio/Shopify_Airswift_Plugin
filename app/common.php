@@ -304,7 +304,7 @@ function encodeSHA256withRSA($content,$privateKey0=''){
         wordwrap($privateKey0, 64, "\n", true) .
         "\n-----END RSA PRIVATE KEY-----";
 
-    Db::table('asp_log')->save(['nr'=>'$privateKey','msg'=>$privateKey]);
+    Db::table('asp_log')->save(['msg'=>'$privateKey','nr'=>$privateKey]);
 
     openssl_sign($content, $sign, $privateKey, OPENSSL_ALGO_SHA256);
 
