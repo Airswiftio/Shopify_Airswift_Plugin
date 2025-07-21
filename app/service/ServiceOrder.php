@@ -284,6 +284,7 @@ class ServiceOrder extends Base
 
         $pay_url = $php_result['data']['cashierUrl'];
         $this->xielog("CreatePayment-----$order_id",$d);
+        $this->xielog("CreatePayment1-----$order_id",$data);
         $payQrUrl_key = $data['source'].'_'.$da0['coinId'].'_payQrUrl_'.$order_id;
         Cache::set($payQrUrl_key,['url'=>$pay_url,'time'=>time()],24*60*60);
         return r_ok('ok', $pay_url);
