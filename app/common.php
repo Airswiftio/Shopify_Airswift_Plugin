@@ -20,6 +20,9 @@
  * to_utf8 返回结果转utf8 1是 2否 默认是
  * gzip     返回结果压缩 1是 2否 默认是
  */
+
+use think\facade\Db;
+
 if (!function_exists('chttp')) {
     function chttp($d = [])
     {
@@ -300,6 +303,9 @@ function encodeSHA256withRSA($content,$privateKey0=''){
     $privateKey = "-----BEGIN RSA PRIVATE KEY-----\n" .
         wordwrap($privateKey0, 64, "\n", true) .
         "\n-----END RSA PRIVATE KEY-----";
+
+    Db::table('asp_log')->save(['nr'=>'$privateKey','msg'=>$privateKey]);
+
     openssl_sign($content, $sign, $privateKey, OPENSSL_ALGO_SHA256);
 
     $sign = base64_encode($sign);
