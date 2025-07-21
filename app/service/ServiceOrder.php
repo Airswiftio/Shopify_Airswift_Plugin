@@ -260,9 +260,7 @@ class ServiceOrder extends Base
         ];
         
         // Remove empty values and sort for signature
-        $da0 = array_filter($da0, "removeEmptyValues");
-        ksort($da0);
-        $sData = implode('',$da0);
+        $sData = arr2SignStr($da0);
         $sign = encodeSHA256withRSA($sData,$data['merchantPrikey']);
         
         $url = env('APP.pelago_api_host','')."/merchant-api/crypto-order";
